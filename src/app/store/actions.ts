@@ -10,6 +10,8 @@ export enum ActionTypes {
   LogoutSuccess = '[Auth API] logout success',
   LogoutFailure = '[Auth API] logout failure',
 
+  UnauthError = '[Auth API] unauthenticated error',
+
   SessionRestored = '[Vault API] session restored',
 }
 
@@ -32,6 +34,8 @@ export const logoutFailure = createAction(
   ActionTypes.LogoutFailure,
   props<{ errorMessage: string }>(),
 );
+
+export const unauthError = createAction(ActionTypes.UnauthError);
 
 export const sessionRestored = createAction(
   ActionTypes.SessionRestored,

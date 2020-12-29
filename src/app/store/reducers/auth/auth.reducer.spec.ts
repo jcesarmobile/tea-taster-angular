@@ -8,6 +8,7 @@ import {
   logoutFailure,
   logoutSuccess,
   sessionRestored,
+  unauthError,
 } from '@app/store/actions';
 import { Session } from '@app/models';
 
@@ -124,6 +125,30 @@ describe('logout actions', () => {
         loading: false,
         errorMessage: 'There was a failure, it was a mess',
       });
+    });
+  });
+
+  describe(ActionTypes.UnauthError, () => {
+    it('clears the session', () => {
+      const action = unauthError();
+      expect(
+        reducer(
+          {
+            session: {
+              user: {
+                id: 42,
+                firstName: 'Douglas',
+                lastName: 'Adams',
+                email: 'solong@thanksforthefish.com',
+              },
+              token: 'Imalittletoken',
+            },
+            loading: false,
+            errorMessage: '',
+          },
+          action,
+        ),
+      ).toEqual({ loading: false, errorMessage: '' });
     });
   });
 
