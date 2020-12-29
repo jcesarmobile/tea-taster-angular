@@ -7,6 +7,7 @@ import {
   logout,
   logoutFailure,
   logoutSuccess,
+  sessionRestored,
 } from '@app/store/actions';
 import { Session } from '@app/models';
 
@@ -122,6 +123,26 @@ describe('logout actions', () => {
         session,
         loading: false,
         errorMessage: 'There was a failure, it was a mess',
+      });
+    });
+  });
+
+  describe(ActionTypes.SessionRestored, () => {
+    it('sets the session', () => {
+      const session: Session = {
+        user: {
+          id: 42,
+          firstName: 'Douglas',
+          lastName: 'Adams',
+          email: 'solong@thanksforthefish.com',
+        },
+        token: 'Imalittletoken',
+      };
+      const action = sessionRestored({ session });
+      expect(reducer({ loading: false, errorMessage: '' }, action)).toEqual({
+        session,
+        loading: false,
+        errorMessage: '',
       });
     });
   });

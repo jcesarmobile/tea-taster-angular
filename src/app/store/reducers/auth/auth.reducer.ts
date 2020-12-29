@@ -45,6 +45,10 @@ const authReducer = createReducer(
     loading: false,
     errorMessage,
   })),
+  on(Actions.sessionRestored, (state, { session }) => ({
+    ...state,
+    session,
+  })),
 );
 
 export function reducer(state: AuthState | undefined, action: Action) {
