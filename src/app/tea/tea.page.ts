@@ -1,5 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { State } from '@app/store';
+
 import { Tea } from '@app/models';
+import { logout } from '@app/store/actions';
+import { Store } from '@ngrx/store';
 
 @Component({
   selector: 'app-tea',
@@ -84,7 +88,11 @@ export class TeaPage implements OnInit {
     return matrix;
   }
 
-  constructor() {}
+  constructor(private store: Store<State>) {}
 
   ngOnInit() {}
+
+  logout() {
+    this.store.dispatch(logout());
+  }
 }

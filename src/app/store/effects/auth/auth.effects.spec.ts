@@ -3,9 +3,14 @@ import { NavController } from '@ionic/angular';
 import { provideMockActions } from '@ngrx/effects/testing';
 import { Observable, of } from 'rxjs';
 
-import { ActionTypes, login, loginSuccess } from '@app/store/actions';
+import {
+  ActionTypes,
+  login,
+  loginSuccess,
+  logout,
+  logoutSuccess,
+} from '@app/store/actions';
 import { createNavControllerMock } from '@test/mocks';
-import { Session } from '@app/models';
 import { SessionVaultService } from '@app/core';
 import { createSessionVaultServiceMock } from '@app/core/testing';
 import { AuthEffects } from './auth.effects';
@@ -115,6 +120,39 @@ describe('AuthEffects', () => {
       effects.loginSuccess$.subscribe(() => {
         expect(navController.navigateRoot).toHaveBeenCalledTimes(1);
         expect(navController.navigateRoot).toHaveBeenCalledWith(['/']);
+        done();
+      });
+    });
+  });
+
+  describe('logout$', () => {
+    it('clears the session', done => {
+      const sessionVaultService = TestBed.inject(SessionVaultService);
+      actions$ = of(logout());
+      effects.logout$.subscribe(() => {
+        expect(sessionVaultService.logout).toHaveBeenCalledTimes(1);
+        done();
+      });
+    });
+
+    it('dispatches logout success', done => {
+      actions$ = of(logout());
+      effects.logout$.subscribe(action => {
+        expect(action).toEqual({
+          type: ActionTypes.LogoutSuccess,
+        });
+        done();
+      });
+    });
+  });
+
+  describe('logoutSuccess$', () => {
+    it('navigates to the login path', done => {
+      const navController = TestBed.inject(NavController);
+      actions$ = of(logoutSuccess());
+      effects.logoutSuccess$.subscribe(() => {
+        expect(navController.navigateRoot).toHaveBeenCalledTimes(1);
+        expect(navController.navigateRoot).toHaveBeenCalledWith(['/', 'login']);
         done();
       });
     });
