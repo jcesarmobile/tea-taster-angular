@@ -6,7 +6,12 @@ import { TeaService } from '@app/core';
 import { createTeaServiceMock } from '@app/core/testing';
 import { DataEffects } from './data.effects';
 import { Session, Tea } from '@app/models';
-import { ActionTypes, loginSuccess, sessionRestored } from '@app/store/actions';
+import {
+  ActionTypes,
+  loginSuccess,
+  sessionRestored,
+  teaDetailsChangeRating,
+} from '@app/store/actions';
 
 describe('DataEffects', () => {
   let actions$: Observable<any>;
@@ -112,4 +117,49 @@ describe('DataEffects', () => {
       });
     }),
   );
+
+  describe('teaRatingChanged$', () => {
+    it('saves the tea', done => {
+      const teaService = TestBed.inject(TeaService);
+      actions$ = of(teaDetailsChangeRating({ tea: teas[1], rating: 5 }));
+      effects.teaRatingChanged$.subscribe(() => {
+        expect(teaService.save).toHaveBeenCalledTimes(1);
+        expect(teaService.save).toHaveBeenCalledWith({ ...teas[1], rating: 5 });
+        done();
+      });
+    });
+
+    describe('on success', () => {
+      it('dispatches tea rating change success', done => {
+        actions$ = of(teaDetailsChangeRating({ tea: teas[1], rating: 5 }));
+        effects.teaRatingChanged$.subscribe(newAction => {
+          expect(newAction).toEqual({
+            type: ActionTypes.TeaDetailsChangeRatingSuccess,
+            tea: { ...teas[1], rating: 5 },
+          });
+          done();
+        });
+      });
+    });
+
+    describe('on an exception', () => {
+      beforeEach(() => {
+        const teaService = TestBed.inject(TeaService);
+        (teaService.save as any).and.returnValue(
+          Promise.reject(new Error('private storage is blowing chunks?')),
+        );
+      });
+
+      it('dispatches tea rating change failure', done => {
+        actions$ = of(teaDetailsChangeRating({ tea: teas[1], rating: 5 }));
+        effects.teaRatingChanged$.subscribe(newAction => {
+          expect(newAction).toEqual({
+            type: ActionTypes.TeaDetailsChangeRatingFailure,
+            errorMessage: 'private storage is blowing chunks?',
+          });
+          done();
+        });
+      });
+    });
+  });
 });

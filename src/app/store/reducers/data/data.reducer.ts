@@ -40,6 +40,18 @@ const dataReducer = createReducer(
     ...state,
     teas: [],
   })),
+  on(Actions.teaDetailsChangeRatingSuccess, (state, { tea }) => {
+    const teas = [...state.teas];
+    const idx = state.teas.findIndex(t => t.id === tea.id);
+    if (idx > -1) {
+      teas.splice(idx, 1, tea);
+    }
+    return { ...state, teas };
+  }),
+  on(Actions.teaDetailsChangeRatingFailure, (state, { errorMessage }) => ({
+    ...state,
+    errorMessage,
+  })),
 );
 
 export function reducer(state: DataState | undefined, action: Action) {

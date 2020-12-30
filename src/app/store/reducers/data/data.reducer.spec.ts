@@ -6,6 +6,8 @@ import {
   loginSuccess,
   logoutSuccess,
   sessionRestored,
+  teaDetailsChangeRatingFailure,
+  teaDetailsChangeRatingSuccess,
 } from '@app/store/actions';
 import { Session, Tea } from '@app/models';
 
@@ -82,6 +84,20 @@ it('returns the default state', () => {
     action: logoutSuccess(),
     begin: { teas },
     end: {},
+  },
+  {
+    description: `${ActionTypes.TeaDetailsChangeRatingSuccess}: sets the rating for the tea`,
+    action: teaDetailsChangeRatingSuccess({ tea: { ...teas[1], rating: 3 } }),
+    begin: { teas },
+    end: { teas: [teas[0], { ...teas[1], rating: 3 }, teas[2]] },
+  },
+  {
+    description: `${ActionTypes.TeaDetailsChangeRatingFailure}: sets the error message`,
+    action: teaDetailsChangeRatingFailure({
+      errorMessage: 'The save blew some chunks',
+    }),
+    begin: { teas },
+    end: { teas, errorMessage: 'The save blew some chunks' },
   },
 ].forEach(test =>
   it(test.description, () => {

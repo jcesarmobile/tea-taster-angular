@@ -16,6 +16,10 @@ export enum ActionTypes {
   UnauthError = '[Auth API] unauthenticated error',
 
   SessionRestored = '[Vault API] session restored',
+
+  TeaDetailsChangeRating = '[Tea Details Page] change rating',
+  TeaDetailsChangeRatingSuccess = '[Data API] change rating success',
+  TeaDetailsChangeRatingFailure = '[Data API] change rating failure',
 }
 
 export const initialLoadSuccess = createAction(
@@ -52,4 +56,17 @@ export const unauthError = createAction(ActionTypes.UnauthError);
 export const sessionRestored = createAction(
   ActionTypes.SessionRestored,
   props<{ session: Session }>(),
+);
+
+export const teaDetailsChangeRating = createAction(
+  ActionTypes.TeaDetailsChangeRating,
+  props<{ tea: Tea; rating: number }>(),
+);
+export const teaDetailsChangeRatingSuccess = createAction(
+  ActionTypes.TeaDetailsChangeRatingSuccess,
+  props<{ tea: Tea }>(),
+);
+export const teaDetailsChangeRatingFailure = createAction(
+  ActionTypes.TeaDetailsChangeRatingFailure,
+  props<{ errorMessage: string }>(),
 );

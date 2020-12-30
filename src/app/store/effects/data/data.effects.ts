@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { of } from 'rxjs';
+import { from, of } from 'rxjs';
 import { catchError, map, mergeMap } from 'rxjs/operators';
 
 import {
@@ -8,6 +8,9 @@ import {
   loginSuccess,
   initialLoadSuccess,
   initialLoadFailure,
+  teaDetailsChangeRating,
+  teaDetailsChangeRatingFailure,
+  teaDetailsChangeRatingSuccess,
 } from '@app/store/actions';
 import { TeaService } from '@app/core';
 
@@ -23,6 +26,30 @@ export class DataEffects {
             of(
               initialLoadFailure({
                 errorMessage: 'Error in data load, check server logs',
+              }),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+
+  teaRatingChanged$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(teaDetailsChangeRating),
+      mergeMap(action =>
+        from(
+          this.teaService.save({ ...action.tea, rating: action.rating }),
+        ).pipe(
+          map(() =>
+            teaDetailsChangeRatingSuccess({
+              tea: { ...action.tea, rating: action.rating },
+            }),
+          ),
+          catchError(err =>
+            of(
+              teaDetailsChangeRatingFailure({
+                errorMessage: err.message || 'Unknown error in rating save',
               }),
             ),
           ),
