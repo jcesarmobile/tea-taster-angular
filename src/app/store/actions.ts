@@ -1,5 +1,6 @@
-import { Session, Tea } from '@app/models';
 import { createAction, props } from '@ngrx/store';
+
+import { Session, TastingNote, Tea } from '@app/models';
 
 export enum ActionTypes {
   InitialLoadSuccess = '[Data API] initial data load success',
@@ -20,6 +21,18 @@ export enum ActionTypes {
   TeaDetailsChangeRating = '[Tea Details Page] change rating',
   TeaDetailsChangeRatingSuccess = '[Data API] change rating success',
   TeaDetailsChangeRatingFailure = '[Data API] change rating failure',
+
+  NotesPageLoaded = '[Notes Page] loaded',
+  NotesPageDataLoadedSuccess = '[Data API] notes page loaded success',
+  NotesPageDataLoadedFailure = '[Data API] notes page loaded failure',
+
+  NoteSaved = '[Note Editor] note saved',
+  NoteSavedSuccess = '[Data API] note saved success',
+  NoteSavedFailure = '[Data API] note saved failure',
+
+  NoteDeleted = '[Notes Page] note deleted',
+  NoteDeletedSuccess = '[Data API] note deleted success',
+  NoteDeletedFailure = '[Data API] note deleted failure',
 }
 
 export const initialLoadSuccess = createAction(
@@ -68,5 +81,41 @@ export const teaDetailsChangeRatingSuccess = createAction(
 );
 export const teaDetailsChangeRatingFailure = createAction(
   ActionTypes.TeaDetailsChangeRatingFailure,
+  props<{ errorMessage: string }>(),
+);
+
+export const notesPageLoaded = createAction(ActionTypes.NotesPageLoaded);
+export const notesPageLoadedSuccess = createAction(
+  ActionTypes.NotesPageDataLoadedSuccess,
+  props<{ notes: Array<TastingNote> }>(),
+);
+export const notesPageLoadedFailure = createAction(
+  ActionTypes.NotesPageDataLoadedFailure,
+  props<{ errorMessage: string }>(),
+);
+
+export const noteSaved = createAction(
+  ActionTypes.NoteSaved,
+  props<{ note: TastingNote }>(),
+);
+export const noteSavedSuccess = createAction(
+  ActionTypes.NoteSavedSuccess,
+  props<{ note: TastingNote }>(),
+);
+export const noteSavedFailure = createAction(
+  ActionTypes.NoteSavedFailure,
+  props<{ errorMessage: string }>(),
+);
+
+export const noteDeleted = createAction(
+  ActionTypes.NoteDeleted,
+  props<{ note: TastingNote }>(),
+);
+export const noteDeletedSuccess = createAction(
+  ActionTypes.NoteDeletedSuccess,
+  props<{ note: TastingNote }>(),
+);
+export const noteDeletedFailure = createAction(
+  ActionTypes.NoteDeletedFailure,
   props<{ errorMessage: string }>(),
 );

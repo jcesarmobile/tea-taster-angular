@@ -1,14 +1,16 @@
 import { Action, createReducer, on } from '@ngrx/store';
 import * as Actions from '@app/store/actions';
-import { Tea } from '@app/models';
+import { TastingNote, Tea } from '@app/models';
 
 export interface DataState {
+  notes: Array<TastingNote>;
   teas: Array<Tea>;
   loading: boolean;
   errorMessage: string;
 }
 
 export const initialState: DataState = {
+  notes: [],
   teas: [],
   loading: false,
   errorMessage: '',
@@ -38,6 +40,7 @@ const dataReducer = createReducer(
   })),
   on(Actions.logoutSuccess, state => ({
     ...state,
+    notes: [],
     teas: [],
   })),
   on(Actions.teaDetailsChangeRatingSuccess, (state, { tea }) => {
@@ -50,6 +53,67 @@ const dataReducer = createReducer(
   }),
   on(Actions.teaDetailsChangeRatingFailure, (state, { errorMessage }) => ({
     ...state,
+    errorMessage,
+  })),
+  on(Actions.notesPageLoaded, state => ({
+    ...state,
+    loading: true,
+    errorMessage: '',
+  })),
+  on(Actions.notesPageLoadedSuccess, (state, { notes }) => ({
+    ...state,
+    loading: false,
+    notes,
+  })),
+  on(Actions.notesPageLoadedFailure, (state, { errorMessage }) => ({
+    ...state,
+    loading: false,
+    errorMessage,
+  })),
+  on(Actions.noteSaved, state => ({
+    ...state,
+    loading: true,
+    errorMessage: '',
+  })),
+  on(Actions.noteSavedSuccess, (state, { note }) => {
+    const notes = [...state.notes];
+    const idx = notes.findIndex(n => n.id === note.id);
+    if (idx > -1) {
+      notes.splice(idx, 1, note);
+    } else {
+      notes.push(note);
+    }
+    return {
+      ...state,
+      notes,
+      loading: false,
+    };
+  }),
+  on(Actions.noteSavedFailure, (state, { errorMessage }) => ({
+    ...state,
+    loading: false,
+    errorMessage,
+  })),
+  on(Actions.noteDeleted, state => ({
+    ...state,
+    loading: true,
+    errorMessage: '',
+  })),
+  on(Actions.noteDeletedSuccess, (state, { note }) => {
+    const notes = [...state.notes];
+    const idx = notes.findIndex(n => n.id === note.id);
+    if (idx > -1) {
+      notes.splice(idx, 1);
+    }
+    return {
+      ...state,
+      notes,
+      loading: false,
+    };
+  }),
+  on(Actions.noteDeletedFailure, (state, { errorMessage }) => ({
+    ...state,
+    loading: false,
     errorMessage,
   })),
 );
