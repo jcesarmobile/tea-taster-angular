@@ -51,6 +51,6 @@ export class TeaPage implements OnInit {
   }
 
   showDetailsPage(id: number) {
-    this.navController.navigateForward(['tea-details', id]);
+    this.navController.navigateForward(['tabs', 'tea', 'tea-details', id]);
   }
 }
