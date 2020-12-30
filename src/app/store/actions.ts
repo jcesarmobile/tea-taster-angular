@@ -1,7 +1,10 @@
-import { Session } from '@app/models';
+import { Session, Tea } from '@app/models';
 import { createAction, props } from '@ngrx/store';
 
 export enum ActionTypes {
+  InitialLoadSuccess = '[Data API] initial data load success',
+  InitialLoadFailure = '[Data API] initial data load failure',
+
   Login = '[LoginPage] login',
   LoginSuccess = '[Auth API] login success',
   LoginFailure = '[Auth API] login failure',
@@ -14,6 +17,15 @@ export enum ActionTypes {
 
   SessionRestored = '[Vault API] session restored',
 }
+
+export const initialLoadSuccess = createAction(
+  ActionTypes.InitialLoadSuccess,
+  props<{ teas: Array<Tea> }>(),
+);
+export const initialLoadFailure = createAction(
+  ActionTypes.InitialLoadFailure,
+  props<{ errorMessage: string }>(),
+);
 
 export const login = createAction(
   ActionTypes.Login,

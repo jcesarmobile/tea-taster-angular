@@ -10,7 +10,7 @@ import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { reducers, metaReducers } from './store';
-import { AuthEffects } from './store/effects';
+import { AuthEffects, DataEffects } from './store/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { environment } from '../environments/environment';
 import { AuthInterceptor, UnauthInterceptor } from './core';
@@ -30,7 +30,7 @@ import { AuthInterceptor, UnauthInterceptor } from './core';
         strictActionImmutability: true,
       },
     }),
-    EffectsModule.forRoot([AuthEffects]),
+    EffectsModule.forRoot([AuthEffects, DataEffects]),
     StoreDevtoolsModule.instrument({
       maxAge: 25,
       logOnly: environment.production,

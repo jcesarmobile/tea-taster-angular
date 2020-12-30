@@ -3,12 +3,20 @@ import { DebugElement } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { IonicModule } from '@ionic/angular';
 import { Store } from '@ngrx/store';
-import { provideMockStore } from '@ngrx/store/testing';
+import { MockStore, provideMockStore } from '@ngrx/store/testing';
 
-import { AuthState, initialState } from '@app/store/reducers/auth/auth.reducer';
+import {
+  AuthState,
+  initialState as initialAuthState,
+} from '@app/store/reducers/auth/auth.reducer';
+import {
+  DataState,
+  initialState as initialDataState,
+} from '@app/store/reducers/data/data.reducer';
 import { TeaPage } from './tea.page';
 import { Tea } from '@app/models';
 import { logout } from '@app/store/actions';
+import { selectTeas } from '@app/store/selectors';
 
 describe('TeaPage', () => {
   let component: TeaPage;
@@ -22,11 +30,14 @@ describe('TeaPage', () => {
         declarations: [TeaPage],
         imports: [IonicModule],
         providers: [
-          provideMockStore<{ auth: AuthState }>({
-            initialState: { auth: initialState },
+          provideMockStore<{ auth: AuthState; data: DataState }>({
+            initialState: { auth: initialAuthState, data: initialDataState },
           }),
         ],
       }).compileComponents();
+
+      const store = TestBed.inject(Store) as MockStore;
+      store.overrideSelector(selectTeas, teas);
 
       fixture = TestBed.createComponent(TeaPage);
       component = fixture.componentInstance;
