@@ -66,6 +66,26 @@ describe(ActionTypes.LoginFailure, () => {
   });
 });
 
+describe(ActionTypes.SessionRestored, () => {
+  it('sets the session', () => {
+    const session: Session = {
+      user: {
+        id: 42,
+        firstName: 'Douglas',
+        lastName: 'Adams',
+        email: 'solong@thanksforthefish.com',
+      },
+      token: 'Imalittletoken',
+    };
+    const action = sessionRestored({ session });
+    expect(reducer({ loading: false, errorMessage: '' }, action)).toEqual({
+      session,
+      loading: false,
+      errorMessage: '',
+    });
+  });
+});
+
 describe('logout actions', () => {
   let session: Session;
   beforeEach(
@@ -149,26 +169,6 @@ describe('logout actions', () => {
           action,
         ),
       ).toEqual({ loading: false, errorMessage: '' });
-    });
-  });
-
-  describe(ActionTypes.SessionRestored, () => {
-    it('sets the session', () => {
-      const session: Session = {
-        user: {
-          id: 42,
-          firstName: 'Douglas',
-          lastName: 'Adams',
-          email: 'solong@thanksforthefish.com',
-        },
-        token: 'Imalittletoken',
-      };
-      const action = sessionRestored({ session });
-      expect(reducer({ loading: false, errorMessage: '' }, action)).toEqual({
-        session,
-        loading: false,
-        errorMessage: '',
-      });
     });
   });
 });
