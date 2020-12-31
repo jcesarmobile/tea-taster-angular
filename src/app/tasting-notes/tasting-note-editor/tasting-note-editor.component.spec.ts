@@ -1,23 +1,29 @@
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
+import { Plugins } from '@capacitor/core';
 import { Store } from '@ngrx/store';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
-import { IonicModule, ModalController } from '@ionic/angular';
+import { IonicModule, ModalController, Platform } from '@ionic/angular';
 
 import { SharedModule } from '@app/shared';
 import { selectTeas } from '@app/store';
 import { DataState, initialState } from '@app/store/reducers/data/data.reducer';
-import { createOverlayControllerMock } from '@test/mocks';
+import { createOverlayControllerMock, createPlatformMock } from '@test/mocks';
 import { TastingNoteEditorComponent } from './tasting-note-editor.component';
 import { noteSaved } from '@app/store/actions';
 
 describe('TastingNoteEditorComponent', () => {
   let component: TastingNoteEditorComponent;
   let fixture: ComponentFixture<TastingNoteEditorComponent>;
+  let originalShare: any;
 
   beforeEach(
     waitForAsync(() => {
+      originalShare = Plugins.Share;
+      Plugins.Share = jasmine.createSpyObj('Share', {
+        share: Promise.resolve(),
+      });
       TestBed.configureTestingModule({
         declarations: [TastingNoteEditorComponent],
         imports: [FormsModule, IonicModule, SharedModule],
@@ -28,6 +34,10 @@ describe('TastingNoteEditorComponent', () => {
           {
             provide: ModalController,
             useFactory: () => createOverlayControllerMock('ModalController'),
+          },
+          {
+            provide: Platform,
+            useFactory: createPlatformMock,
           },
         ],
       }).compileComponents();
@@ -54,6 +64,8 @@ describe('TastingNoteEditorComponent', () => {
       component = fixture.componentInstance;
     }),
   );
+
+  afterEach(() => (Plugins.Share = originalShare));
 
   it('should create', () => {
     fixture.detectChanges();
@@ -118,6 +130,71 @@ describe('TastingNoteEditorComponent', () => {
         const footer = fixture.debugElement.query(By.css('ion-footer'));
         const el = footer.query(By.css('ion-button'));
         expect(el.nativeElement.textContent).toEqual('Update');
+      });
+    });
+  });
+
+  describe('share', () => {
+    describe('in a web context', () => {
+      beforeEach(() => {
+        const platform = TestBed.inject(Platform);
+        (platform.is as any).withArgs('hybrid').and.returnValue(false);
+        fixture.detectChanges();
+      });
+
+      it('is not available', () => {
+        expect(fixture.debugElement.query(By.css('#share-button'))).toBeFalsy();
+      });
+    });
+
+    describe('in a mobile context', () => {
+      beforeEach(() => {
+        const platform = TestBed.inject(Platform);
+        (platform.is as any).withArgs('hybrid').and.returnValue(true);
+        fixture.detectChanges();
+      });
+
+      it('is available', () => {
+        expect(
+          fixture.debugElement.query(By.css('#share-button')),
+        ).toBeTruthy();
+      });
+
+      it('is not allowed until a brand, name, and rating have all beeen entered', () => {
+        const button = fixture.debugElement.query(By.css('#share-button'));
+        expect(button.nativeElement.disabled).toBeTrue();
+
+        component.brand = 'Lipton';
+        fixture.detectChanges();
+        expect(button.nativeElement.disabled).toBeTrue();
+
+        component.name = 'Yellow Label';
+        fixture.detectChanges();
+        expect(button.nativeElement.disabled).toBeTrue();
+
+        component.rating = 2;
+        fixture.detectChanges();
+        expect(button.nativeElement.disabled).toBeFalse();
+      });
+
+      it('calls the share plugin when clicked', async () => {
+        const button = fixture.debugElement.query(By.css('#share-button'));
+
+        component.brand = 'Lipton';
+        component.name = 'Yellow Label';
+        component.rating = 2;
+
+        const event = new Event('click');
+        button.nativeElement.dispatchEvent(event);
+        fixture.detectChanges();
+
+        expect(Plugins.Share.share).toHaveBeenCalledTimes(1);
+        expect(Plugins.Share.share).toHaveBeenCalledWith({
+          title: 'Lipton: Yellow Label',
+          text: 'I gave Lipton: Yellow Label 2 stars on the Tea Taster app',
+          dialogTitle: 'Share your tasting note',
+          url: 'https://tea-taster-training.web.app',
+        });
       });
     });
   });
