@@ -15,7 +15,6 @@ import {
 } from '@app/store/reducers/data/data.reducer';
 import { TeaPage } from './tea.page';
 import { Tea } from '@app/models';
-import { logout } from '@app/store/actions';
 import { selectTeas } from '@app/store/selectors';
 import { createNavControllerMock } from '@test/mocks';
 
@@ -99,19 +98,6 @@ describe('TeaPage', () => {
           teas[idx].description,
         );
       });
-    });
-  });
-
-  describe('logout button', () => {
-    it('dispatches the logout button', () => {
-      const button = fixture.debugElement.query(
-        By.css('[data-testid="logout-button"]'),
-      );
-      const store = TestBed.inject(Store);
-      spyOn(store, 'dispatch');
-      click(button.nativeElement);
-      expect(store.dispatch).toHaveBeenCalledTimes(1);
-      expect(store.dispatch).toHaveBeenCalledWith(logout());
     });
   });
 

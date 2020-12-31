@@ -5,7 +5,6 @@ import { map } from 'rxjs/operators';
 
 import { Tea } from '@app/models';
 import { State } from '@app/store';
-import { logout } from '@app/store/actions';
 import { selectTeas } from '@app/store/selectors';
 import { NavController } from '@ionic/angular';
 
@@ -44,10 +43,6 @@ export class TeaPage implements OnInit {
     this.teas$ = this.store
       .select(selectTeas)
       .pipe(map(teas => this.teaMatrix(teas)));
-  }
-
-  logout() {
-    this.store.dispatch(logout());
   }
 
   showDetailsPage(id: number) {
