@@ -1,25 +1,30 @@
 import { Injectable } from '@angular/core';
+import { Store } from '@ngrx/store';
+import {
+  AuthMode,
+  IonicIdentityVaultUser,
+  IonicNativeAuthPlugin,
+} from '@ionic-enterprise/identity-vault';
+import { Platform } from '@ionic/angular';
+
 import { Session } from '@app/models';
 import { State } from '@app/store';
-import { sessionRestored } from '@app/store/actions';
-import { Storage } from '@capacitor/storage';
-import { Store } from '@ngrx/store';
+import { BrowserVaultPlugin } from '../browser-vault/browser-vault.plugin';
 
 @Injectable({
   providedIn: 'root',
 })
-export class SessionVaultService {
-  private key = 'auth-session';
-
-  constructor(private store: Store<State>) {}
-
-  async login(session: Session): Promise<void> {
-    await Storage.set({ key: this.key, value: JSON.stringify(session) });
+export class SessionVaultService extends IonicIdentityVaultUser<Session> {
+  constructor(
+    private browserVaultPlugin: BrowserVaultPlugin,
+    platform: Platform,
+    private store: Store<State>,
+  ) {
+    super(platform, { authMode: AuthMode.SecureStorage });
   }
 
   async restoreSession(): Promise<Session> {
-    const { value } = await Storage.get({ key: this.key });
-    const session = JSON.parse(value);
+    const session = await super.restoreSession();
 
     if (session) {
       this.store.dispatch(sessionRestored({ session }));
@@ -28,7 +33,10 @@ export class SessionVaultService {
     return session;
   }
 
-  async logout(): Promise<void> {
-    await Storage.remove({ key: this.key });
+  getPlugin(): IonicNativeAuthPlugin {
+    if ((this.platform as Platform).is('hybrid')) {
+      return super.getPlugin();
+    }
+    return this.browserVaultPlugin;
   }
 }
