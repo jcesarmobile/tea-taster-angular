@@ -124,8 +124,8 @@ describe('DataEffects', () => {
 
         it('dispatches initial load success', done => {
           actions$ = of(action);
-          effects.sessionLoaded$.subscribe(action => {
-            expect(action).toEqual({
+          effects.sessionLoaded$.subscribe(mappedAction => {
+            expect(mappedAction).toEqual({
               type: ActionTypes.InitialLoadSuccess,
               teas,
             });
