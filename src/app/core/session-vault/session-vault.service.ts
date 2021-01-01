@@ -7,12 +7,13 @@ import {
   LockEvent,
   VaultErrorCodes,
 } from '@ionic-enterprise/identity-vault';
-import { Platform } from '@ionic/angular';
+import { ModalController, Platform } from '@ionic/angular';
 
 import { Session } from '@app/models';
 import { sessionLocked, sessionRestored } from '@app/store/actions';
 import { State } from '@app/store';
 import { BrowserVaultPlugin } from '../browser-vault/browser-vault.plugin';
+import { PinDialogComponent } from '@app/pin-dialog/pin-dialog.component';
 
 @Injectable({
   providedIn: 'root',
@@ -20,6 +21,7 @@ import { BrowserVaultPlugin } from '../browser-vault/browser-vault.plugin';
 export class SessionVaultService extends IonicIdentityVaultUser<Session> {
   constructor(
     private browserVaultPlugin: BrowserVaultPlugin,
+    private modalController: ModalController,
     platform: Platform,
     private store: Store<State>,
   ) {
@@ -73,6 +75,19 @@ export class SessionVaultService extends IonicIdentityVaultUser<Session> {
 
   onSessionRestored(session: Session) {
     this.store.dispatch(sessionRestored({ session }));
+  }
+
+  async onPasscodeRequest(isPasscodeSetRequest: boolean): Promise<string> {
+    const dlg = await this.modalController.create({
+      backdropDismiss: false,
+      component: PinDialogComponent,
+      componentProps: {
+        setPasscodeMode: isPasscodeSetRequest,
+      },
+    });
+    dlg.present();
+    const { data } = await dlg.onDidDismiss();
+    return Promise.resolve(data || '');
   }
 
   getPlugin(): IonicNativeAuthPlugin {
