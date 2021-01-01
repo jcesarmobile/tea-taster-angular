@@ -4,10 +4,13 @@ import {
   AuthMode,
   IonicIdentityVaultUser,
   IonicNativeAuthPlugin,
+  LockEvent,
+  VaultErrorCodes,
 } from '@ionic-enterprise/identity-vault';
 import { Platform } from '@ionic/angular';
 
 import { Session } from '@app/models';
+import { sessionLocked, sessionRestored } from '@app/store/actions';
 import { State } from '@app/store';
 import { BrowserVaultPlugin } from '../browser-vault/browser-vault.plugin';
 
@@ -20,17 +23,56 @@ export class SessionVaultService extends IonicIdentityVaultUser<Session> {
     platform: Platform,
     private store: Store<State>,
   ) {
-    super(platform, { authMode: AuthMode.SecureStorage });
+    super(platform, {
+      unlockOnAccess: true,
+      hideScreenOnBackground: true,
+      lockAfter: 5000,
+    });
+  }
+
+  async login(session: Session): Promise<void> {
+    const mode = (await this.isBiometricsAvailable())
+      ? AuthMode.BiometricOnly
+      : AuthMode.PasscodeOnly;
+    await super.login(session, mode);
   }
 
   async restoreSession(): Promise<Session> {
-    const session = await super.restoreSession();
+    try {
+      return await super.restoreSession();
+    } catch (error) {
+      if (error.code === VaultErrorCodes.VaultLocked) {
+        const vault = await this.getVault();
+        await vault.clear();
+      } else {
+        throw error;
+      }
+    }
+  }
 
-    if (session) {
-      this.store.dispatch(sessionRestored({ session }));
+  async canUnlock(): Promise<boolean> {
+    if (!(await this.hasStoredSession())) {
+      return false;
+    }
+    const vault = await this.getVault();
+    if (!(await vault.isLocked())) {
+      return false;
     }
 
-    return session;
+    const mode = await this.getAuthMode();
+    return (
+      mode === AuthMode.PasscodeOnly ||
+      mode === AuthMode.BiometricAndPasscode ||
+      (mode === AuthMode.BiometricOnly && (await this.isBiometricsAvailable()))
+    );
+  }
+
+  onVaultLocked(event: LockEvent) {
+    this.store.dispatch(sessionLocked());
+  }
+
+  onSessionRestored(session: Session) {
+    this.store.dispatch(sessionRestored({ session }));
   }
 
   getPlugin(): IonicNativeAuthPlugin {

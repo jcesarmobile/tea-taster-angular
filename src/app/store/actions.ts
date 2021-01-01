@@ -30,8 +30,17 @@ export const logoutFailure = createAction(
   props<{ errorMessage: string }>(),
 );
 
+export const unlockSession = createAction('[Login Page] unlock session');
+export const unlockSessionSuccess = createAction(
+  '[Vault API] unlock session success',
+);
+export const unlockSessionFailure = createAction(
+  '[Vault API] unlock session failure',
+);
+
 export const unauthError = createAction('[Auth API] unauthenticated error');
 
+export const sessionLocked = createAction('[Vault API] session locked');
 export const sessionRestored = createAction(
   '[Vault API] session restored',
   props<{ session: Session }>(),
