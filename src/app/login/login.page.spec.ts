@@ -13,8 +13,10 @@ import { MockStore, provideMockStore } from '@ngrx/store/testing';
 
 import { AuthState, initialState } from '@app/store/reducers/auth.reducer';
 import { LoginPage } from './login.page';
-import { login } from '@app/store/actions';
+import { login, unlockSession } from '@app/store/actions';
 import { selectAuthErrorMessage } from '@app/store';
+import { SessionVaultService } from '@app/core';
+import { createSessionVaultServiceMock } from '@app/core/testing';
 
 describe('LoginPage', () => {
   let component: LoginPage;
@@ -29,6 +31,10 @@ describe('LoginPage', () => {
           provideMockStore<{ auth: AuthState }>({
             initialState: { auth: initialState },
           }),
+          {
+            provide: SessionVaultService,
+            useFactory: createSessionVaultServiceMock,
+          },
         ],
       }).compileComponents();
 
@@ -45,6 +51,44 @@ describe('LoginPage', () => {
   it('displays the title properly', () => {
     const title = fixture.debugElement.query(By.css('ion-title'));
     expect(title.nativeElement.textContent.trim()).toBe('Login');
+  });
+
+  describe('when there is nothing to unlock', () => {
+    beforeEach(async () => {
+      const vault = TestBed.inject(SessionVaultService);
+      (vault.canUnlock as any).and.returnValue(Promise.resolve(false));
+      await component.ngOnInit();
+      fixture.detectChanges();
+    });
+
+    it('the unlock item is not displayed', () => {
+      const unlock = fixture.debugElement.query(By.css('.unlock-app'));
+      expect(unlock).toBeFalsy();
+    });
+  });
+
+  describe('when there is a session taht can be unlocked', () => {
+    beforeEach(async () => {
+      const vault = TestBed.inject(SessionVaultService);
+      (vault.canUnlock as any).and.returnValue(Promise.resolve(true));
+      await component.ngOnInit();
+      fixture.detectChanges();
+    });
+
+    it('the unlock item is displayed', () => {
+      const unlock = fixture.debugElement.query(By.css('.unlock-app'));
+      expect(unlock).toBeTruthy();
+    });
+
+    it('clicking the unlock item dispatches unlock session', () => {
+      const unlock = fixture.debugElement.query(By.css('.unlock-app'))
+        .nativeElement;
+      const store = TestBed.inject(Store);
+      spyOn(store, 'dispatch');
+      click(unlock);
+      expect(store.dispatch).toHaveBeenCalledTimes(1);
+      expect(store.dispatch).toHaveBeenCalledWith(unlockSession());
+    });
   });
 
   describe('email input binding', () => {

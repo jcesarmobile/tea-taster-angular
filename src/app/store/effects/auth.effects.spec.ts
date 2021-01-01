@@ -8,7 +8,10 @@ import {
   loginSuccess,
   logout,
   logoutSuccess,
+  sessionLocked,
   unauthError,
+  unlockSession,
+  unlockSessionSuccess,
 } from '@app/store/actions';
 import { createNavControllerMock } from '@test/mocks';
 import { AuthenticationService, SessionVaultService } from '@app/core';
@@ -168,12 +171,22 @@ describe('AuthEffects', () => {
     });
   });
 
-  describe('loginSuccess$', () => {
-    it('navigates to the root path', done => {
-      const navController = TestBed.inject(NavController);
-      actions$ = of(
-        loginSuccess({
-          session: {
+  describe('unlockSession$', () => {
+    it('attempts to restore the session', done => {
+      const vault = TestBed.inject(SessionVaultService);
+      (vault.restoreSession as any).and.returnValue(Promise.resolve(undefined));
+      actions$ = of(unlockSession());
+      effects.unlockSession$.subscribe(() => {
+        expect(vault.restoreSession).toHaveBeenCalledTimes(1);
+        done();
+      });
+    });
+
+    describe('unlock success', () => {
+      beforeEach(() => {
+        const vault = TestBed.inject(SessionVaultService);
+        (vault.restoreSession as any).and.returnValue(
+          Promise.resolve({
             user: {
               id: 73,
               firstName: 'Ken',
@@ -181,13 +194,56 @@ describe('AuthEffects', () => {
               email: 'test@test.com',
             },
             token: '314159',
-          },
-        }),
-      );
-      effects.loginSuccess$.subscribe(() => {
-        expect(navController.navigateRoot).toHaveBeenCalledTimes(1);
-        expect(navController.navigateRoot).toHaveBeenCalledWith(['/']);
-        done();
+          }),
+        );
+      });
+
+      it('dispatches unlock success', done => {
+        actions$ = of(unlockSession());
+        effects.unlockSession$.subscribe(action => {
+          expect(action).toEqual({
+            type: '[Vault API] unlock session success',
+          });
+          done();
+        });
+      });
+    });
+
+    describe('unlock failure', () => {
+      beforeEach(() => {
+        const vault = TestBed.inject(SessionVaultService);
+        (vault.restoreSession as any).and.returnValue(
+          Promise.resolve(undefined),
+        );
+      });
+
+      it('dispatches unlock failure', done => {
+        actions$ = of(unlockSession());
+        effects.unlockSession$.subscribe(action => {
+          expect(action).toEqual({
+            type: '[Vault API] unlock session failure',
+          });
+          done();
+        });
+      });
+    });
+
+    describe('on an exception', () => {
+      beforeEach(() => {
+        const vault = TestBed.inject(SessionVaultService);
+        (vault.restoreSession as any).and.returnValue(
+          throwError(new Error('the vault is blowing chunks')),
+        );
+      });
+
+      it('dispatches unlock failure', done => {
+        actions$ = of(unlockSession());
+        effects.unlockSession$.subscribe(action => {
+          expect(action).toEqual({
+            type: '[Vault API] unlock session success',
+          });
+          done();
+        });
       });
     });
   });
@@ -256,17 +312,49 @@ describe('AuthEffects', () => {
     });
   });
 
-  describe('logoutSuccess$', () => {
-    it('navigates to the login path', done => {
-      const navController = TestBed.inject(NavController);
-      actions$ = of(logoutSuccess());
-      effects.logoutSuccess$.subscribe(() => {
-        expect(navController.navigateRoot).toHaveBeenCalledTimes(1);
-        expect(navController.navigateRoot).toHaveBeenCalledWith(['/', 'login']);
-        done();
+  [
+    loginSuccess({
+      session: {
+        user: {
+          id: 73,
+          firstName: 'Ken',
+          lastName: 'Sodemann',
+          email: 'test@test.com',
+        },
+        token: '314159',
+      },
+    }),
+    unlockSessionSuccess(),
+  ].forEach(action =>
+    describe(`navigateToRoot$ for ${action.type}`, () => {
+      it('navigates to the root path', done => {
+        const navController = TestBed.inject(NavController);
+        actions$ = of(action);
+        effects.navigateToRoot$.subscribe(() => {
+          expect(navController.navigateRoot).toHaveBeenCalledTimes(1);
+          expect(navController.navigateRoot).toHaveBeenCalledWith(['/']);
+          done();
+        });
       });
-    });
-  });
+    }),
+  );
+
+  [logoutSuccess(), sessionLocked()].forEach(action =>
+    describe(`navigateToLogin$ for ${action.type}`, () => {
+      it('navigates to the login path', done => {
+        const navController = TestBed.inject(NavController);
+        actions$ = of(action);
+        effects.navigateToLogin$.subscribe(() => {
+          expect(navController.navigateRoot).toHaveBeenCalledTimes(1);
+          expect(navController.navigateRoot).toHaveBeenCalledWith([
+            '/',
+            'login',
+          ]);
+          done();
+        });
+      });
+    }),
+  );
 
   describe('unauthError$', () => {
     it('clears the session from storage', done => {
