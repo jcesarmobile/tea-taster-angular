@@ -1,5 +1,6 @@
 import { createAction, props } from '@ngrx/store';
 import { Session, TastingNote, Tea } from '@app/models';
+import { AuthMode } from '@ionic-enterprise/identity-vault';
 
 export const initialLoadSuccess = createAction(
   '[Data API] initial data load success',
@@ -12,7 +13,7 @@ export const initialLoadFailure = createAction(
 
 export const login = createAction(
   '[LoginPage] login',
-  props<{ email: string; password: string }>(),
+  props<{ email: string; password: string; mode?: AuthMode }>(),
 );
 export const loginSuccess = createAction(
   '[Auth API] login success',

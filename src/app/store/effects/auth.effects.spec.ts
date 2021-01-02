@@ -20,6 +20,7 @@ import {
   createSessionVaultServiceMock,
 } from '@app/core/testing';
 import { AuthEffects } from './auth.effects';
+import { AuthMode } from '@ionic-enterprise/identity-vault';
 
 describe('AuthEffects', () => {
   let actions$: Observable<any>;
@@ -97,18 +98,27 @@ describe('AuthEffects', () => {
 
       it('saves the session', done => {
         const sessionVaultService = TestBed.inject(SessionVaultService);
-        actions$ = of(login({ email: 'test@test.com', password: 'test' }));
+        actions$ = of(
+          login({
+            email: 'test@test.com',
+            password: 'test',
+            mode: AuthMode.PasscodeOnly,
+          }),
+        );
         effects.login$.subscribe(() => {
           expect(sessionVaultService.login).toHaveBeenCalledTimes(1);
-          expect(sessionVaultService.login).toHaveBeenCalledWith({
-            user: {
-              id: 73,
-              firstName: 'Ken',
-              lastName: 'Sodemann',
-              email: 'test@test.com',
+          expect(sessionVaultService.login).toHaveBeenCalledWith(
+            {
+              user: {
+                id: 73,
+                firstName: 'Ken',
+                lastName: 'Sodemann',
+                email: 'test@test.com',
+              },
+              token: '314159',
             },
-            token: '314159',
-          });
+            AuthMode.PasscodeOnly,
+          );
           done();
         });
       });
@@ -240,7 +250,7 @@ describe('AuthEffects', () => {
         actions$ = of(unlockSession());
         effects.unlockSession$.subscribe(action => {
           expect(action).toEqual({
-            type: '[Vault API] unlock session success',
+            type: '[Vault API] unlock session failure',
           });
           done();
         });

@@ -7,8 +7,6 @@ import { ModalController } from '@ionic/angular';
   styleUrls: ['./pin-dialog.component.scss'],
 })
 export class PinDialogComponent implements OnInit {
-  private verifyPin: string;
-
   @Input() setPasscodeMode: boolean;
 
   displayPin: string;
@@ -16,6 +14,8 @@ export class PinDialogComponent implements OnInit {
   pin: string;
   prompt: string;
   title: string;
+
+  private verifyPin: string;
 
   constructor(private modalController: ModalController) {}
 
