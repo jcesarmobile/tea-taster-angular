@@ -6,6 +6,7 @@ import {
   logout,
   logoutFailure,
   logoutSuccess,
+  sessionLocked,
   sessionRestored,
   unauthError,
 } from '@app/store/actions';
@@ -79,6 +80,27 @@ describe('Session Restored', () => {
     const action = sessionRestored({ session });
     expect(reducer({ loading: false, errorMessage: '' }, action)).toEqual({
       session,
+      loading: false,
+      errorMessage: '',
+    });
+  });
+});
+
+describe('Session Locked', () => {
+  it('clears the session', () => {
+    const session: Session = {
+      user: {
+        id: 42,
+        firstName: 'Douglas',
+        lastName: 'Adams',
+        email: 'solong@thanksforthefish.com',
+      },
+      token: 'Imalittletoken',
+    };
+    const action = sessionLocked();
+    expect(
+      reducer({ session, loading: false, errorMessage: '' }, action),
+    ).toEqual({
       loading: false,
       errorMessage: '',
     });

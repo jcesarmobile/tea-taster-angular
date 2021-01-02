@@ -50,6 +50,11 @@ const authReducer = createReducer(
     delete newState.session;
     return newState;
   }),
+  on(Actions.sessionLocked, state => {
+    const newState = { ...state };
+    delete newState.session;
+    return newState;
+  }),
   on(Actions.sessionRestored, (state, { session }) => ({
     ...state,
     session,

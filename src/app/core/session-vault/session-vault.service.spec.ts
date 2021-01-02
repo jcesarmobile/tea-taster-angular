@@ -1,18 +1,32 @@
 import { TestBed } from '@angular/core/testing';
 import { Store } from '@ngrx/store';
-import { sessionRestored } from '@app/store/actions';
-import { Storage } from '@capacitor/storage';
+import { ModalController, Platform } from '@ionic/angular';
 
-import { Session } from '@app/models';
 import { SessionVaultService } from './session-vault.service';
 import { provideMockStore } from '@ngrx/store/testing';
+import {
+  createOverlayControllerMock,
+  createOverlayElementMock,
+  createPlatformMock,
+} from '@test/mocks';
+import { sessionLocked, sessionRestored } from '@app/store/actions';
+import { PinDialogComponent } from '@app/pin-dialog/pin-dialog.component';
 
 describe('SessionVaultService', () => {
+  let modal: HTMLIonModalElement;
   let service: SessionVaultService;
 
   beforeEach(() => {
+    modal = createOverlayElementMock('Modal');
     TestBed.configureTestingModule({
-      providers: [provideMockStore()],
+      providers: [
+        provideMockStore(),
+        {
+          provide: ModalController,
+          useValue: createOverlayControllerMock('ModalController', modal),
+        },
+        { provide: Platform, useFactory: createPlatformMock },
+      ],
     });
     service = TestBed.inject(SessionVaultService);
   });
@@ -21,100 +35,67 @@ describe('SessionVaultService', () => {
     expect(service).toBeTruthy();
   });
 
-  describe('login', () => {
-    beforeEach(() => {
-      spyOn(Storage, 'set').and.returnValue(Promise.resolve());
-    });
-
-    it('saves the session in storage', async () => {
-      const session: Session = {
-        user: {
-          id: 42,
-          firstName: 'Joe',
-          lastName: 'Tester',
-          email: 'test@test.org',
-        },
-        token: '19940059fkkf039',
-      };
-      await service.login(session);
-      expect(Storage.set).toHaveBeenCalledTimes(1);
-      expect(Storage.set).toHaveBeenCalledWith({
-        key: 'auth-session',
-        value: JSON.stringify(session),
-      });
-    });
+  it('dispatches sessionLocked when the session is locked', () => {
+    const store = TestBed.inject(Store);
+    spyOn(store, 'dispatch');
+    service.onVaultLocked(null);
+    expect(store.dispatch).toHaveBeenCalledTimes(1);
+    expect(store.dispatch).toHaveBeenCalledWith(sessionLocked());
   });
 
-  describe('restoreSession', () => {
-    it('gets the session from storage', async () => {
-      spyOn(Storage, 'get').and.returnValue(Promise.resolve({ value: null }));
-      await service.restoreSession();
-      expect(Storage.get).toHaveBeenCalledTimes(1);
-      expect(Storage.get).toHaveBeenCalledWith({
-        key: 'auth-session',
-      });
-    });
-
-    describe('with a session', () => {
-      const session: Session = {
-        user: {
-          id: 42,
-          firstName: 'Joe',
-          lastName: 'Tester',
-          email: 'test@test.org',
-        },
-        token: '19940059fkkf039',
-      };
-      beforeEach(() => {
-        spyOn(Storage, 'get').and.returnValue(
-          Promise.resolve({ value: JSON.stringify(session) }),
-        );
-      });
-
-      it('resolves the session', async () => {
-        expect(await service.restoreSession()).toEqual(session);
-      });
-
-      it('dispatches session restored', async () => {
-        const store = TestBed.inject(Store);
-        spyOn(store, 'dispatch');
-        await service.restoreSession();
-        expect(store.dispatch).toHaveBeenCalledTimes(1);
-        expect(store.dispatch).toHaveBeenCalledWith(
-          sessionRestored({ session }),
-        );
-      });
-    });
-
-    describe('without a session', () => {
-      beforeEach(() => {
-        spyOn(Storage, 'get').and.returnValue(Promise.resolve({ value: null }));
-      });
-
-      it('resolves the session', async () => {
-        expect(await service.restoreSession()).toEqual(null);
-      });
-
-      it('does not dispatch session restored', async () => {
-        const store = TestBed.inject(Store);
-        spyOn(store, 'dispatch');
-        await service.restoreSession();
-        expect(store.dispatch).not.toHaveBeenCalled();
-      });
-    });
+  it('dispatches sessionRestored when the session is restored', () => {
+    const session = {
+      token: '28843938593',
+      user: {
+        id: 73,
+        firstName: 'Sheldon',
+        lastName: 'Cooper',
+        email: 'physics@science.net',
+      },
+    };
+    const store = TestBed.inject(Store);
+    spyOn(store, 'dispatch');
+    service.onSessionRestored(session);
+    expect(store.dispatch).toHaveBeenCalledTimes(1);
+    expect(store.dispatch).toHaveBeenCalledWith(sessionRestored({ session }));
   });
 
-  describe('logout', () => {
+  describe('onPasscodeRequest', () => {
     beforeEach(() => {
-      spyOn(Storage, 'remove').and.returnValue(Promise.resolve());
+      (modal.onDidDismiss as any).and.returnValue(
+        Promise.resolve({ role: 'cancel' }),
+      );
     });
 
-    it('clears the storage', async () => {
-      await service.logout();
-      expect(Storage.remove).toHaveBeenCalledTimes(1);
-      expect(Storage.remove).toHaveBeenCalledWith({
-        key: 'auth-session',
+    [true, false].forEach(setPasscode => {
+      it(`creates a PIN dialog, setting passcode: ${setPasscode}`, async () => {
+        const modalController = TestBed.inject(ModalController);
+        await service.onPasscodeRequest(setPasscode);
+        expect(modalController.create).toHaveBeenCalledTimes(1);
+        expect(modalController.create).toHaveBeenCalledWith({
+          backdropDismiss: false,
+          component: PinDialogComponent,
+          componentProps: {
+            setPasscodeMode: setPasscode,
+          },
+        });
       });
+    });
+
+    it('presents the modal', async () => {
+      await service.onPasscodeRequest(false);
+      expect(modal.present).toHaveBeenCalledTimes(1);
+    });
+
+    it('resolves to the PIN', async () => {
+      (modal.onDidDismiss as any).and.returnValue(
+        Promise.resolve({ data: '4203', role: 'OK' }),
+      );
+      expect(await service.onPasscodeRequest(true)).toEqual('4203');
+    });
+
+    it('resolves to an empty string if the PIN is undefined', async () => {
+      expect(await service.onPasscodeRequest(true)).toEqual('');
     });
   });
 });
