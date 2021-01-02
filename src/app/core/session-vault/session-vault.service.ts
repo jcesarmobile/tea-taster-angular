@@ -29,14 +29,9 @@ export class SessionVaultService extends IonicIdentityVaultUser<Session> {
       unlockOnAccess: true,
       hideScreenOnBackground: true,
       lockAfter: 5000,
+      allowSystemPinFallback: true,
+      shouldClearVaultAfterTooManyFailedAttempts: false,
     });
-  }
-
-  async login(session: Session): Promise<void> {
-    const mode = (await this.isBiometricsAvailable())
-      ? AuthMode.BiometricOnly
-      : AuthMode.PasscodeOnly;
-    await super.login(session, mode);
   }
 
   async restoreSession(): Promise<Session> {

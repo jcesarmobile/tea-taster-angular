@@ -28,7 +28,7 @@ export class AuthEffects {
         this.auth.login(action.email, action.password).pipe(
           tap(session => {
             if (session) {
-              this.sessionVault.login(session);
+              this.sessionVault.login(session, action.mode);
             }
           }),
           map(session =>
