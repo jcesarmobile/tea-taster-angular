@@ -1,17 +1,32 @@
-// This file can be replaced during build by using the `fileReplacements` array.
-// `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
-// The list of file replacements can be found in `angular.json`.
+import { IonicAuthOptions } from '@ionic-enterprise/auth';
+
+const baseConfig = {
+  clientID: 'b69e2ee7-b67a-4e26-8a38-f7ca30d2e4d4',
+  scope:
+    'openid offline_access email profile https://vikingsquad.onmicrosoft.com/api/Hello.Read',
+  discoveryUrl:
+    'https://vikingsquad.b2clogin.com/vikingsquad.onmicrosoft.com/v2.0/.well-known/openid-configuration?p=B2C_1_Signup_Signin',
+  audience: 'https://api.myapp.com',
+  authConfig: 'azure' as 'azure',
+};
+
+export const mobileAzureConfig: IonicAuthOptions = {
+  ...baseConfig,
+  redirectUri: 'myapp://callback',
+  logoutUrl: 'myapp://callback?logout=true',
+  platform: 'cordova',
+  iosWebView: 'private',
+  androidToolbarColor: 'Red',
+};
+
+export const webAzureConfig: IonicAuthOptions = {
+  ...baseConfig,
+  redirectUri: 'http://localhost:8100/login',
+  logoutUrl: 'http://localhost:8100/login',
+  platform: 'web',
+};
 
 export const environment = {
   production: false,
   dataService: 'https://cs-demo-api.herokuapp.com',
 };
-
-/*
- * For easier debugging in development mode, you can import the following file
- * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.
- *
- * This import should be commented out in production mode because it will have a negative impact
- * on performance if an error is thrown.
- */
-// import 'zone.js/dist/zone-error';  // Included with Angular CLI.
