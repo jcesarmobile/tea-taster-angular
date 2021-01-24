@@ -2,8 +2,13 @@ import { TestBed } from '@angular/core/testing';
 import { provideMockActions } from '@ngrx/effects/testing';
 import { Observable, of, throwError } from 'rxjs';
 
-import { TastingNotesService, TeaService } from '@app/core';
 import {
+  AuthenticationService,
+  TastingNotesService,
+  TeaService,
+} from '@app/core';
+import {
+  createAuthenticationServiceMock,
   createTastingNotesServiceMock,
   createTeaServiceMock,
 } from '@app/core/testing';
@@ -14,6 +19,7 @@ import {
   noteDeleted,
   noteSaved,
   notesPageLoaded,
+  startup,
   teaDetailsChangeRating,
   unlockSessionSuccess,
 } from '@app/store/actions';
@@ -84,6 +90,10 @@ describe('DataEffects', () => {
         DataEffects,
         provideMockActions(() => actions$),
         {
+          provide: AuthenticationService,
+          useFactory: createAuthenticationServiceMock,
+        },
+        {
           provide: TastingNotesService,
           useFactory: createTastingNotesServiceMock,
         },
@@ -100,56 +110,96 @@ describe('DataEffects', () => {
     expect(effects).toBeTruthy();
   });
 
-  [loginSuccess({ user }), unlockSessionSuccess({ user })].forEach(action =>
-    describe(`sessionLoaded$ with ${action.type}`, () => {
-      it('fetches the teas', done => {
-        const teaService = TestBed.inject(TeaService);
-        (teaService.getAll as any).and.returnValue(of(undefined));
-        actions$ = of(action);
-        effects.sessionLoaded$.subscribe(() => {
-          expect(teaService.getAll).toHaveBeenCalledTimes(1);
-          done();
-        });
-      });
+  [loginSuccess({ user }), startup(), unlockSessionSuccess({ user })].forEach(
+    action =>
+      describe(`sessionLoaded$ with ${action.type}`, () => {
+        describe('when not authenticated', () => {
+          beforeEach(() => {
+            const auth = TestBed.inject(AuthenticationService);
+            (auth.isAuthenticated as any).and.returnValue(
+              Promise.resolve(false),
+            );
+          });
 
-      describe('on success', () => {
-        beforeEach(() => {
-          const teaService = TestBed.inject(TeaService);
-          (teaService.getAll as any).and.returnValue(of(teas));
-        });
-
-        it('dispatches initial load success', done => {
-          actions$ = of(action);
-          effects.sessionLoaded$.subscribe(mappedAction => {
-            expect(mappedAction).toEqual({
-              type: '[Data API] initial data load success',
-              teas,
+          it('does not fetch the teas', done => {
+            const teaService = TestBed.inject(TeaService);
+            (teaService.getAll as any).and.returnValue(of(undefined));
+            actions$ = of(action);
+            effects.sessionLoaded$.subscribe(() => {
+              expect(teaService.getAll).not.toHaveBeenCalled();
+              done();
             });
-            done();
+          });
+
+          it('dispatches initial load success', done => {
+            actions$ = of(action);
+            effects.sessionLoaded$.subscribe(mappedAction => {
+              expect(mappedAction).toEqual({
+                type: '[Data API] initial data load success',
+                teas: [],
+              });
+              done();
+            });
           });
         });
-      });
 
-      describe('on an exception', () => {
-        beforeEach(() => {
-          const teaService = TestBed.inject(TeaService);
-          (teaService.getAll as any).and.returnValue(
-            throwError(new Error('the server is blowing chunks')),
-          );
-        });
+        describe('when authenticated', () => {
+          beforeEach(() => {
+            const auth = TestBed.inject(AuthenticationService);
+            (auth.isAuthenticated as any).and.returnValue(
+              Promise.resolve(true),
+            );
+          });
 
-        it('dispatches initial load failure', done => {
-          actions$ = of(action);
-          effects.sessionLoaded$.subscribe(newAction => {
-            expect(newAction).toEqual({
-              type: '[Data API] initial data load failure',
-              errorMessage: 'Error in data load, check server logs',
+          it('fetches the teas', done => {
+            const teaService = TestBed.inject(TeaService);
+            (teaService.getAll as any).and.returnValue(of(undefined));
+            actions$ = of(action);
+            effects.sessionLoaded$.subscribe(() => {
+              expect(teaService.getAll).toHaveBeenCalledTimes(1);
+              done();
             });
-            done();
+          });
+
+          describe('on success', () => {
+            beforeEach(() => {
+              const teaService = TestBed.inject(TeaService);
+              (teaService.getAll as any).and.returnValue(of(teas));
+            });
+
+            it('dispatches initial load success', done => {
+              actions$ = of(action);
+              effects.sessionLoaded$.subscribe(mappedAction => {
+                expect(mappedAction).toEqual({
+                  type: '[Data API] initial data load success',
+                  teas,
+                });
+                done();
+              });
+            });
+          });
+
+          describe('on an exception', () => {
+            beforeEach(() => {
+              const teaService = TestBed.inject(TeaService);
+              (teaService.getAll as any).and.returnValue(
+                throwError(new Error('the server is blowing chunks')),
+              );
+            });
+
+            it('dispatches initial load failure', done => {
+              actions$ = of(action);
+              effects.sessionLoaded$.subscribe(newAction => {
+                expect(newAction).toEqual({
+                  type: '[Data API] initial data load failure',
+                  errorMessage: 'Error in data load, check server logs',
+                });
+                done();
+              });
+            });
           });
         });
-      });
-    }),
+      }),
   );
 
   describe('teaRatingChanged$', () => {
