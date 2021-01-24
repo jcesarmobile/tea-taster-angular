@@ -23,6 +23,7 @@ Each step of the training has its own commit within the `main` branch. You shoul
 - `main` - shows the completed `@ionic/angular` three-day Enterprise training project. This project is used as the basis for other trainings
 - `feature/pwa` - shows the completed `@ionic/angular` PWA training. In this training, we use the Angular PWA toolkit to add a service worker and webapp manifest to our project. We also add an application service that listens for updates to the PWA and offeres to restart when a complete update is available. This version of the application can be deployed as a hybrid native application (iOS and Android) or as a PWA using the same code base.
 - `feature/identity-vault` - shows the completed Identity Vault training for `@ionic/angular` applications. This branch also contains a few "demo" features that are not included in the training making it suitable for a customer-facing demo.
+- `feature/auth-connect` - shows the completed Auth Connect with Identity Vault training for `@ionic/angular` applications. This branch is also being used as our demo application for using AuthConnect with Identity Vault. This branch is build on top of `feature/identity-vault` so if a rebase is required when maintaining the app, be sure to rebase on that branch.
 
 Each of the branches has a similar structure to `main` whereby each step is signified by its own commit in the branch.
 
