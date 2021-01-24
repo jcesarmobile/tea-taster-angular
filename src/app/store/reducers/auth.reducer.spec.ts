@@ -7,10 +7,10 @@ import {
   logoutFailure,
   logoutSuccess,
   sessionLocked,
-  sessionRestored,
   unauthError,
+  unlockSessionSuccess,
 } from '@app/store/actions';
-import { Session } from '@app/models';
+import { User } from '@app/models';
 
 it('returns the default state', () => {
   expect(reducer(undefined, { type: 'NOOP' })).toEqual(initialState);
@@ -35,19 +35,16 @@ describe('Login', () => {
 });
 
 describe('Login Success', () => {
-  it('clears the loading flag and sets the session', () => {
-    const session: Session = {
-      user: {
-        id: 42,
-        firstName: 'Douglas',
-        lastName: 'Adams',
-        email: 'solong@thanksforthefish.com',
-      },
-      token: 'Imalittletoken',
+  it('clears the loading flag and sets the user', () => {
+    const user: User = {
+      id: 42,
+      firstName: 'Douglas',
+      lastName: 'Adams',
+      email: 'solong@thanksforthefish.com',
     };
-    const action = loginSuccess({ session });
+    const action = loginSuccess({ user });
     expect(reducer({ loading: true, errorMessage: '' }, action)).toEqual({
-      session,
+      user,
       loading: false,
       errorMessage: '',
     });
@@ -66,41 +63,35 @@ describe('Login Failure', () => {
   });
 });
 
-describe('Session Restored', () => {
-  it('sets the session', () => {
-    const session: Session = {
-      user: {
-        id: 42,
-        firstName: 'Douglas',
-        lastName: 'Adams',
-        email: 'solong@thanksforthefish.com',
-      },
-      token: 'Imalittletoken',
+describe('Session Locked', () => {
+  it('clears the user', () => {
+    const user: User = {
+      id: 42,
+      firstName: 'Douglas',
+      lastName: 'Adams',
+      email: 'solong@thanksforthefish.com',
     };
-    const action = sessionRestored({ session });
-    expect(reducer({ loading: false, errorMessage: '' }, action)).toEqual({
-      session,
-      loading: false,
-      errorMessage: '',
-    });
+    const action = sessionLocked();
+    expect(reducer({ user, loading: false, errorMessage: '' }, action)).toEqual(
+      {
+        loading: false,
+        errorMessage: '',
+      },
+    );
   });
 });
 
-describe('Session Locked', () => {
-  it('clears the session', () => {
-    const session: Session = {
-      user: {
-        id: 42,
-        firstName: 'Douglas',
-        lastName: 'Adams',
-        email: 'solong@thanksforthefish.com',
-      },
-      token: 'Imalittletoken',
+describe('Unlock Session Success', () => {
+  it('sets the user', () => {
+    const user: User = {
+      id: 42,
+      firstName: 'Douglas',
+      lastName: 'Adams',
+      email: 'solong@thanksforthefish.com',
     };
-    const action = sessionLocked();
-    expect(
-      reducer({ session, loading: false, errorMessage: '' }, action),
-    ).toEqual({
+    const action = unlockSessionSuccess({ user });
+    expect(reducer({ loading: false, errorMessage: '' }, action)).toEqual({
+      user,
       loading: false,
       errorMessage: '',
     });
@@ -108,17 +99,14 @@ describe('Session Locked', () => {
 });
 
 describe('logout actions', () => {
-  let session: Session;
+  let user: User;
   beforeEach(
     () =>
-      (session = {
-        user: {
-          id: 42,
-          firstName: 'Douglas',
-          lastName: 'Adams',
-          email: 'solong@thanksforthefish.com',
-        },
-        token: 'Imalittletoken',
+      (user = {
+        id: 42,
+        firstName: 'Douglas',
+        lastName: 'Adams',
+        email: 'solong@thanksforthefish.com',
       }),
   );
 
@@ -128,14 +116,14 @@ describe('logout actions', () => {
       expect(
         reducer(
           {
-            session,
+            user,
             loading: false,
             errorMessage: 'this is useless information',
           },
           action,
         ),
       ).toEqual({
-        session,
+        user,
         loading: true,
         errorMessage: '',
       });
@@ -143,10 +131,10 @@ describe('logout actions', () => {
   });
 
   describe('Logout Success', () => {
-    it('clears the loading flag and the session', () => {
+    it('clears the loading flag and the user', () => {
       const action = logoutSuccess();
       expect(
-        reducer({ session, loading: true, errorMessage: '' }, action),
+        reducer({ user, loading: true, errorMessage: '' }, action),
       ).toEqual({
         loading: false,
         errorMessage: '',
@@ -160,9 +148,9 @@ describe('logout actions', () => {
         errorMessage: 'There was a failure, it was a mess',
       });
       expect(
-        reducer({ session, loading: true, errorMessage: '' }, action),
+        reducer({ user, loading: true, errorMessage: '' }, action),
       ).toEqual({
-        session,
+        user,
         loading: false,
         errorMessage: 'There was a failure, it was a mess',
       });
@@ -170,19 +158,16 @@ describe('logout actions', () => {
   });
 
   describe('Unauth Error', () => {
-    it('clears the session', () => {
+    it('clears the user', () => {
       const action = unauthError();
       expect(
         reducer(
           {
-            session: {
-              user: {
-                id: 42,
-                firstName: 'Douglas',
-                lastName: 'Adams',
-                email: 'solong@thanksforthefish.com',
-              },
-              token: 'Imalittletoken',
+            user: {
+              id: 42,
+              firstName: 'Douglas',
+              lastName: 'Adams',
+              email: 'solong@thanksforthefish.com',
             },
             loading: false,
             errorMessage: '',

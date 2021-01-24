@@ -4,7 +4,6 @@ import { from, of } from 'rxjs';
 import { catchError, map, mergeMap } from 'rxjs/operators';
 
 import {
-  sessionRestored,
   loginSuccess,
   initialLoadSuccess,
   initialLoadFailure,
@@ -20,6 +19,7 @@ import {
   teaDetailsChangeRating,
   teaDetailsChangeRatingFailure,
   teaDetailsChangeRatingSuccess,
+  unlockSessionSuccess,
 } from '@app/store/actions';
 import { TastingNotesService, TeaService } from '@app/core';
 
@@ -27,7 +27,7 @@ import { TastingNotesService, TeaService } from '@app/core';
 export class DataEffects {
   sessionLoaded$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(loginSuccess, sessionRestored),
+      ofType(loginSuccess, unlockSessionSuccess),
       mergeMap(() =>
         this.teaService.getAll().pipe(
           map(teas => initialLoadSuccess({ teas })),
