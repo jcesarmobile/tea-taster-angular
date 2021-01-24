@@ -4,13 +4,11 @@ import {
   AuthMode,
   IonicIdentityVaultUser,
   IonicNativeAuthPlugin,
-  LockEvent,
-  VaultErrorCodes,
 } from '@ionic-enterprise/identity-vault';
 import { ModalController, Platform } from '@ionic/angular';
 
 import { Session } from '@app/models';
-import { sessionLocked, sessionRestored } from '@app/store/actions';
+import { sessionLocked } from '@app/store/actions';
 import { State } from '@app/store';
 import { BrowserVaultPlugin } from '../browser-vault/browser-vault.plugin';
 import { PinDialogComponent } from '@app/pin-dialog/pin-dialog.component';
@@ -34,19 +32,6 @@ export class SessionVaultService extends IonicIdentityVaultUser<Session> {
     });
   }
 
-  async restoreSession(): Promise<Session> {
-    try {
-      return await super.restoreSession();
-    } catch (error) {
-      if (error.code === VaultErrorCodes.VaultLocked) {
-        const vault = await this.getVault();
-        await vault.clear();
-      } else {
-        throw error;
-      }
-    }
-  }
-
   async canUnlock(): Promise<boolean> {
     if (!(await this.hasStoredSession())) {
       return false;
@@ -64,12 +49,13 @@ export class SessionVaultService extends IonicIdentityVaultUser<Session> {
     );
   }
 
-  onVaultLocked(event: LockEvent) {
-    this.store.dispatch(sessionLocked());
+  async isLocked(): Promise<boolean> {
+    const vault = await this.getVault();
+    return vault.isLocked();
   }
 
-  onSessionRestored(session: Session) {
-    this.store.dispatch(sessionRestored({ session }));
+  onVaultLocked() {
+    this.store.dispatch(sessionLocked());
   }
 
   async onPasscodeRequest(isPasscodeSetRequest: boolean): Promise<string> {

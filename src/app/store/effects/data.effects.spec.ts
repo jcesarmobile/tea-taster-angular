@@ -8,14 +8,14 @@ import {
   createTeaServiceMock,
 } from '@app/core/testing';
 import { DataEffects } from './data.effects';
-import { Session, TastingNote, Tea } from '@app/models';
+import { TastingNote, Tea, User } from '@app/models';
 import {
   loginSuccess,
   noteDeleted,
   noteSaved,
   notesPageLoaded,
-  sessionRestored,
   teaDetailsChangeRating,
+  unlockSessionSuccess,
 } from '@app/store/actions';
 
 describe('DataEffects', () => {
@@ -50,14 +50,11 @@ describe('DataEffects', () => {
     },
   ];
 
-  const session: Session = {
-    user: {
-      id: 314,
-      firstName: 'Kevin',
-      lastName: 'Minion',
-      email: 'goodtobebad@gru.org',
-    },
-    token: '39948503',
+  const user: User = {
+    id: 314,
+    firstName: 'Kevin',
+    lastName: 'Minion',
+    email: 'goodtobebad@gru.org',
   };
 
   const teas: Array<Tea> = [
@@ -103,7 +100,7 @@ describe('DataEffects', () => {
     expect(effects).toBeTruthy();
   });
 
-  [loginSuccess({ session }), sessionRestored({ session })].forEach(action =>
+  [loginSuccess({ user }), unlockSessionSuccess({ user })].forEach(action =>
     describe(`sessionLoaded$ with ${action.type}`, () => {
       it('fetches the teas', done => {
         const teaService = TestBed.inject(TeaService);

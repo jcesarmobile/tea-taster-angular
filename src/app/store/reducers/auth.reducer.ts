@@ -1,9 +1,9 @@
 import { Action, createReducer, on } from '@ngrx/store';
 import * as Actions from '@app/store/actions';
-import { Session } from '@app/models';
+import { User } from '@app/models';
 
 export interface AuthState {
-  session?: Session;
+  user?: User;
   loading: boolean;
   errorMessage: string;
 }
@@ -20,9 +20,9 @@ const authReducer = createReducer(
     loading: true,
     errorMessage: '',
   })),
-  on(Actions.loginSuccess, (state, { session }) => ({
+  on(Actions.loginSuccess, (state, { user }) => ({
     ...state,
-    session,
+    user,
     loading: false,
   })),
   on(Actions.loginFailure, (state, { errorMessage }) => ({
@@ -37,7 +37,7 @@ const authReducer = createReducer(
   })),
   on(Actions.logoutSuccess, state => {
     const newState = { ...state, loading: false };
-    delete newState.session;
+    delete newState.user;
     return newState;
   }),
   on(Actions.logoutFailure, (state, { errorMessage }) => ({
@@ -47,17 +47,17 @@ const authReducer = createReducer(
   })),
   on(Actions.unauthError, state => {
     const newState = { ...state };
-    delete newState.session;
+    delete newState.user;
     return newState;
   }),
   on(Actions.sessionLocked, state => {
     const newState = { ...state };
-    delete newState.session;
+    delete newState.user;
     return newState;
   }),
-  on(Actions.sessionRestored, (state, { session }) => ({
+  on(Actions.unlockSessionSuccess, (state, { user }) => ({
     ...state,
-    session,
+    user,
   })),
 );
 

@@ -9,8 +9,10 @@ import {
   createOverlayElementMock,
   createPlatformMock,
 } from '@test/mocks';
-import { sessionLocked, sessionRestored } from '@app/store/actions';
+import { sessionLocked } from '@app/store/actions';
 import { PinDialogComponent } from '@app/pin-dialog/pin-dialog.component';
+import { BrowserVaultService } from '../browser-vault/browser-vault.service';
+import { createBrowserVaultServiceMock } from '../browser-vault/browser-vault.service.mock';
 
 describe('SessionVaultService', () => {
   let modal: HTMLIonModalElement;
@@ -25,6 +27,10 @@ describe('SessionVaultService', () => {
           provide: ModalController,
           useValue: createOverlayControllerMock('ModalController', modal),
         },
+        {
+          provide: BrowserVaultService,
+          useFactory: createBrowserVaultServiceMock,
+        },
         { provide: Platform, useFactory: createPlatformMock },
       ],
     });
@@ -38,26 +44,19 @@ describe('SessionVaultService', () => {
   it('dispatches sessionLocked when the session is locked', () => {
     const store = TestBed.inject(Store);
     spyOn(store, 'dispatch');
-    service.onVaultLocked(null);
+    service.onVaultLocked();
     expect(store.dispatch).toHaveBeenCalledTimes(1);
     expect(store.dispatch).toHaveBeenCalledWith(sessionLocked());
   });
 
-  it('dispatches sessionRestored when the session is restored', () => {
-    const session = {
-      token: '28843938593',
-      user: {
-        id: 73,
-        firstName: 'Sheldon',
-        lastName: 'Cooper',
-        email: 'physics@science.net',
-      },
-    };
-    const store = TestBed.inject(Store);
-    spyOn(store, 'dispatch');
-    service.onSessionRestored(session);
-    expect(store.dispatch).toHaveBeenCalledTimes(1);
-    expect(store.dispatch).toHaveBeenCalledWith(sessionRestored({ session }));
+  describe('isLocked', () => {
+    it('returns the value from the vault', async () => {
+      const vault = TestBed.inject(BrowserVaultService);
+      (vault.isLocked as any).and.returnValue(Promise.resolve(false));
+      expect(await service.isLocked()).toEqual(false);
+      (vault.isLocked as any).and.returnValue(Promise.resolve(true));
+      expect(await service.isLocked()).toEqual(true);
+    });
   });
 
   describe('onPasscodeRequest', () => {
