@@ -66,19 +66,13 @@ export class LoginPage implements OnInit {
   }
 
   signIn() {
-    if (this.canUnlock) {
-      this.zone.run(() => {
-        this.canUnlock = false;
-      });
-    } else {
-      this.store.dispatch(
-        login({
-          email: this.email,
-          password: this.password,
-          mode: this.authMode,
-        }),
-      );
-    }
+    this.store.dispatch(login({ mode: this.authMode }));
+  }
+
+  redo() {
+    this.zone.run(() => {
+      this.canUnlock = false;
+    });
   }
 
   unlock() {

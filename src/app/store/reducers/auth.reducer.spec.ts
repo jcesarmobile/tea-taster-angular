@@ -18,7 +18,7 @@ it('returns the default state', () => {
 
 describe('Login', () => {
   it('sets the loading flag and clears other data', () => {
-    const action = login({ email: 'test@testy.com', password: 'mysecret' });
+    const action = login({});
     expect(
       reducer(
         {

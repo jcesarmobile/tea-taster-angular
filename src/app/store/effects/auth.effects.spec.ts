@@ -52,13 +52,7 @@ describe('AuthEffects', () => {
   describe('login$', () => {
     it('wipes out any existing vault session', done => {
       const vault = TestBed.inject(SessionVaultService);
-      actions$ = of(
-        login({
-          email: 'test@test.com',
-          password: 'test',
-          mode: AuthMode.SecureStorage,
-        }),
-      );
+      actions$ = of(login({ mode: AuthMode.SecureStorage }));
       effects.login$.subscribe(() => {
         expect(vault.logout).toHaveBeenCalledTimes(1);
         done();
@@ -67,13 +61,7 @@ describe('AuthEffects', () => {
 
     it('sets the mode if one is specified', done => {
       const vault = TestBed.inject(SessionVaultService);
-      actions$ = of(
-        login({
-          email: 'test@test.com',
-          password: 'test',
-          mode: AuthMode.BiometricOnly,
-        }),
-      );
+      actions$ = of(login({ mode: AuthMode.BiometricOnly }));
       effects.login$.subscribe(() => {
         expect(vault.setAuthMode).toHaveBeenCalledTimes(1);
         expect(vault.setAuthMode).toHaveBeenCalledWith(AuthMode.BiometricOnly);
@@ -83,12 +71,7 @@ describe('AuthEffects', () => {
 
     it('does not set the mode if one is not specified', done => {
       const vault = TestBed.inject(SessionVaultService);
-      actions$ = of(
-        login({
-          email: 'test@test.com',
-          password: 'test',
-        }),
-      );
+      actions$ = of(login({}));
       effects.login$.subscribe(() => {
         expect(vault.setAuthMode).not.toHaveBeenCalled();
         done();
@@ -97,13 +80,7 @@ describe('AuthEffects', () => {
 
     it('performs a login operation', done => {
       const auth = TestBed.inject(AuthenticationService);
-      actions$ = of(
-        login({
-          email: 'test@test.com',
-          password: 'test',
-          mode: AuthMode.InMemoryOnly,
-        }),
-      );
+      actions$ = of(login({ mode: AuthMode.InMemoryOnly }));
       effects.login$.subscribe(() => {
         expect(auth.login).toHaveBeenCalledTimes(1);
         expect(auth.login).toHaveBeenCalledWith();
@@ -114,7 +91,7 @@ describe('AuthEffects', () => {
     describe('on login success', () => {
       it('gets the user information', done => {
         const auth = TestBed.inject(AuthenticationService);
-        actions$ = of(login({ email: 'test@test.com', password: 'test' }));
+        actions$ = of(login({}));
         effects.login$.subscribe(() => {
           expect(auth.getUserInfo).toHaveBeenCalledTimes(1);
           done();
@@ -131,7 +108,7 @@ describe('AuthEffects', () => {
             email: 'test@test.com',
           }),
         );
-        actions$ = of(login({ email: 'test@test.com', password: 'test' }));
+        actions$ = of(login({}));
         effects.login$.subscribe(action => {
           expect(action).toEqual({
             type: '[Auth API] login success',
@@ -156,7 +133,7 @@ describe('AuthEffects', () => {
       });
 
       it('dispatches the login failure event', done => {
-        actions$ = of(login({ email: 'test@test.com', password: 'badpass' }));
+        actions$ = of(login({}));
         effects.login$.subscribe(action => {
           expect(action).toEqual({
             type: '[Auth API] login failure',
