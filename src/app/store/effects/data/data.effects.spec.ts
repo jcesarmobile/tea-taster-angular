@@ -10,7 +10,6 @@ import {
 import { DataEffects } from './data.effects';
 import { Session, TastingNote, Tea } from '@app/models';
 import {
-  ActionTypes,
   loginSuccess,
   noteDeleted,
   noteSaved,
@@ -126,7 +125,7 @@ describe('DataEffects', () => {
           actions$ = of(action);
           effects.sessionLoaded$.subscribe(mappedAction => {
             expect(mappedAction).toEqual({
-              type: ActionTypes.InitialLoadSuccess,
+              type: '[Data API] initial data load success',
               teas,
             });
             done();
@@ -146,7 +145,7 @@ describe('DataEffects', () => {
           actions$ = of(action);
           effects.sessionLoaded$.subscribe(newAction => {
             expect(newAction).toEqual({
-              type: ActionTypes.InitialLoadFailure,
+              type: '[Data API] initial data load failure',
               errorMessage: 'Error in data load, check server logs',
             });
             done();
@@ -172,7 +171,7 @@ describe('DataEffects', () => {
         actions$ = of(teaDetailsChangeRating({ tea: teas[1], rating: 5 }));
         effects.teaRatingChanged$.subscribe(newAction => {
           expect(newAction).toEqual({
-            type: ActionTypes.TeaDetailsChangeRatingSuccess,
+            type: '[Data API] change rating success',
             tea: { ...teas[1], rating: 5 },
           });
           done();
@@ -192,7 +191,7 @@ describe('DataEffects', () => {
         actions$ = of(teaDetailsChangeRating({ tea: teas[1], rating: 5 }));
         effects.teaRatingChanged$.subscribe(newAction => {
           expect(newAction).toEqual({
-            type: ActionTypes.TeaDetailsChangeRatingFailure,
+            type: '[Data API] change rating failure',
             errorMessage: 'private storage is blowing chunks?',
           });
           done();
@@ -221,7 +220,7 @@ describe('DataEffects', () => {
         actions$ = of(notesPageLoaded());
         effects.notesPageLoaded$.subscribe(newAction => {
           expect(newAction).toEqual({
-            type: ActionTypes.NotesPageDataLoadedSuccess,
+            type: '[Data API] notes page loaded success',
             notes,
           });
           done();
@@ -241,7 +240,7 @@ describe('DataEffects', () => {
         actions$ = of(notesPageLoaded());
         effects.notesPageLoaded$.subscribe(newAction => {
           expect(newAction).toEqual({
-            type: ActionTypes.NotesPageDataLoadedFailure,
+            type: '[Data API] notes page loaded failure',
             errorMessage: 'Error in data load, check server logs',
           });
           done();
@@ -281,7 +280,7 @@ describe('DataEffects', () => {
         actions$ = of(noteSaved({ note }));
         effects.noteSaved$.subscribe(newAction => {
           expect(newAction).toEqual({
-            type: ActionTypes.NoteSavedSuccess,
+            type: '[Data API] note saved success',
             note: noteWithId,
           });
           done();
@@ -301,7 +300,7 @@ describe('DataEffects', () => {
         actions$ = of(noteSaved({ note }));
         effects.noteSaved$.subscribe(newAction => {
           expect(newAction).toEqual({
-            type: ActionTypes.NoteSavedFailure,
+            type: '[Data API] note saved failure',
             errorMessage: 'Error in data load, check server logs',
           });
           done();
@@ -331,7 +330,7 @@ describe('DataEffects', () => {
         actions$ = of(noteDeleted({ note: notes[1] }));
         effects.noteDeleted$.subscribe(newAction => {
           expect(newAction).toEqual({
-            type: ActionTypes.NoteDeletedSuccess,
+            type: '[Data API] note deleted success',
             note: notes[1],
           });
           done();
@@ -351,7 +350,7 @@ describe('DataEffects', () => {
         actions$ = of(noteDeleted({ note: notes[1] }));
         effects.noteDeleted$.subscribe(newAction => {
           expect(newAction).toEqual({
-            type: ActionTypes.NoteDeletedFailure,
+            type: '[Data API] note deleted failure',
             errorMessage: 'Error in data load, check server logs',
           });
           done();

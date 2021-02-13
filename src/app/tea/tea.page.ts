@@ -16,6 +16,21 @@ import { NavController } from '@ionic/angular';
 export class TeaPage implements OnInit {
   teas$: Observable<Array<Array<Tea>>>;
 
+  constructor(
+    private navController: NavController,
+    private store: Store<State>,
+  ) {}
+
+  ngOnInit() {
+    this.teas$ = this.store
+      .select(selectTeas)
+      .pipe(map(teas => this.teaMatrix(teas)));
+  }
+
+  showDetailsPage(id: number) {
+    this.navController.navigateForward(['tabs', 'tea', 'tea-details', id]);
+  }
+
   private teaMatrix(teas: Array<Tea>): Array<Array<Tea>> {
     const matrix: Array<Array<Tea>> = [];
     let row = [];
@@ -32,20 +47,5 @@ export class TeaPage implements OnInit {
     }
 
     return matrix;
-  }
-
-  constructor(
-    private navController: NavController,
-    private store: Store<State>,
-  ) {}
-
-  ngOnInit() {
-    this.teas$ = this.store
-      .select(selectTeas)
-      .pipe(map(teas => this.teaMatrix(teas)));
-  }
-
-  showDetailsPage(id: number) {
-    this.navController.navigateForward(['tabs', 'tea', 'tea-details', id]);
   }
 }

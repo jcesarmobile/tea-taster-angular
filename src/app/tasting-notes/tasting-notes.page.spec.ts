@@ -139,13 +139,13 @@ describe('TastingNotesPage', () => {
     }));
   });
 
-  function click(button: HTMLElement) {
+  const click = (button: HTMLElement) => {
     const event = new Event('click');
     button.dispatchEvent(event);
     fixture.detectChanges();
-  }
+  };
 
-  function initializeTestData() {
+  const initializeTestData = () => {
     testData = [
       {
         id: 73,
@@ -164,5 +164,5 @@ describe('TastingNotesPage', () => {
         teaCategoryId: 3,
       },
     ];
-  }
+  };
 });

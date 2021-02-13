@@ -118,6 +118,4 @@ const dataReducer = createReducer(
   })),
 );
 
-export function reducer(state: DataState | undefined, action: Action) {
-  return dataReducer(state, action);
-}
+export const reducer = dataReducer;

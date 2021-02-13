@@ -128,13 +128,13 @@ describe('TeaPage', () => {
     });
   });
 
-  function click(button: HTMLElement) {
+  const click = (button: HTMLElement) => {
     const event = new Event('click');
     button.dispatchEvent(event);
     fixture.detectChanges();
-  }
+  };
 
-  function initializeTestData() {
+  const initializeTestData = () => {
     teas = [
       {
         id: 1,
@@ -193,5 +193,5 @@ describe('TeaPage', () => {
           'short periods of time.',
       },
     ];
-  }
+  };
 });

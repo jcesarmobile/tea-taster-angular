@@ -1,6 +1,5 @@
 import { DataState, initialState, reducer } from './data.reducer';
 import {
-  ActionTypes,
   initialLoadFailure,
   initialLoadSuccess,
   loginSuccess,
@@ -79,13 +78,11 @@ const teas: Array<Tea> = [
   },
 ];
 
-function createState(stateChanges: {
+const createState = (stateChanges: {
   teas?: Array<Tea>;
   loading?: boolean;
   errorMessage?: string;
-}): DataState {
-  return { ...initialState, ...stateChanges };
-}
+}): DataState => ({ ...initialState, ...stateChanges });
 
 it('returns the default state', () => {
   expect(reducer(undefined, { type: 'NOOP' })).toEqual(initialState);
@@ -93,43 +90,48 @@ it('returns the default state', () => {
 
 [
   {
-    description: `${ActionTypes.LoginSuccess}: sets the loading flag and clears any error message`,
+    description:
+      'Login Success: sets the loading flag and clears any error message',
     action: loginSuccess({ session }),
     begin: { errorMessage: 'Unknown error with data load' },
     end: { loading: true },
   },
   {
-    description: `${ActionTypes.SessionRestored}: sets the loading flag and clears any error message`,
+    description:
+      'Session Restored: sets the loading flag and clears any error message',
     action: sessionRestored({ session }),
     begin: { errorMessage: 'Unknown error with data load' },
     end: { loading: true },
   },
   {
-    description: `${ActionTypes.InitialLoadFailure}: clears the loading flag and sets the error message`,
+    description:
+      'Initial Load Failure: clears the loading flag and sets the error message',
     action: initialLoadFailure({ errorMessage: 'The load blew some chunks' }),
     begin: { loading: true },
     end: { errorMessage: 'The load blew some chunks' },
   },
   {
-    description: `${ActionTypes.InitialLoadSuccess}: clears the loading flag and sets the teas`,
+    description:
+      'Initial Load Success: clears the loading flag and sets the teas',
     action: initialLoadSuccess({ teas }),
     begin: { loading: true },
     end: { teas },
   },
   {
-    description: `${ActionTypes.LogoutSuccess}: clears the tea data`,
+    description: 'Logout Success: clears the tea data',
     action: logoutSuccess(),
     begin: { notes, teas },
     end: {},
   },
   {
-    description: `${ActionTypes.TeaDetailsChangeRatingSuccess}: sets the rating for the tea`,
+    description:
+      'Tea Details Change Rating Success: sets the rating for the tea',
     action: teaDetailsChangeRatingSuccess({ tea: { ...teas[1], rating: 3 } }),
     begin: { teas },
     end: { teas: [teas[0], { ...teas[1], rating: 3 }, teas[2]] },
   },
   {
-    description: `${ActionTypes.TeaDetailsChangeRatingFailure}: sets the error message`,
+    description: 'Tea Details ChangeRating Failure: sets the error message',
     action: teaDetailsChangeRatingFailure({
       errorMessage: 'The save blew some chunks',
     }),
@@ -137,31 +139,35 @@ it('returns the default state', () => {
     end: { teas, errorMessage: 'The save blew some chunks' },
   },
   {
-    description: `${ActionTypes.NotesPageLoaded}: sets the loading flag and clears any error message`,
+    description:
+      'Notes Page Loaded: sets the loading flag and clears any error message',
     action: notesPageLoaded(),
     begin: { teas, errorMessage: 'The last thing, it failed' },
     end: { teas, loading: true },
   },
   {
-    description: `${ActionTypes.NotesPageDataLoadedSuccess}: adds the notes / clears the loading flag`,
+    description:
+      'Notes Page Data Loaded Success: adds the notes / clears the loading flag',
     action: notesPageLoadedSuccess({ notes }),
     begin: { teas, loading: true },
     end: { teas, notes },
   },
   {
-    description: `${ActionTypes.NotesPageDataLoadedFailure}: adds the error message / clears the loading flag`,
+    description:
+      'Notes Page Data Loaded Failure: adds the error message / clears the loading flag',
     action: notesPageLoadedFailure({ errorMessage: 'Something is borked' }),
     begin: { notes, teas, loading: true },
     end: { notes, teas, errorMessage: 'Something is borked' },
   },
   {
-    description: `${ActionTypes.NoteSaved}: sets the loading flag and clears any error message`,
+    description:
+      'Note Saved: sets the loading flag and clears any error message',
     action: noteSaved({ note: notes[2] }),
     begin: { notes, teas, errorMessage: 'The last thing, it failed' },
     end: { notes, teas, loading: true },
   },
   {
-    description: `${ActionTypes.NoteSavedSuccess}: updates an existing note`,
+    description: 'Note Saved Success: updates an existing note',
     action: noteSavedSuccess({
       note: { ...notes[2], brand: 'Generic Tea Co.' },
     }),
@@ -172,7 +178,7 @@ it('returns the default state', () => {
     },
   },
   {
-    description: `${ActionTypes.NoteSavedSuccess}: appends a new note`,
+    description: 'Note Saved Success}: appends a new note',
     action: noteSavedSuccess({
       note: {
         id: 999943,
@@ -200,25 +206,28 @@ it('returns the default state', () => {
     },
   },
   {
-    description: `${ActionTypes.NoteSavedFailure}: adds the error message / clears the loading flag`,
+    description:
+      'Note Saved Failure: adds the error message / clears the loading flag',
     action: noteSavedFailure({ errorMessage: 'Something is borked' }),
     begin: { notes, teas, loading: true },
     end: { notes, teas, errorMessage: 'Something is borked' },
   },
   {
-    description: `${ActionTypes.NoteDeleted}: sets the loading flag and clears any error message`,
+    description:
+      'Note Deleted: sets the loading flag and clears any error message',
     action: noteDeleted({ note: notes[0] }),
     begin: { notes, teas, errorMessage: 'The last thing, it failed' },
     end: { notes, teas, loading: true },
   },
   {
-    description: `${ActionTypes.NoteDeletedSuccess}: removes the note`,
+    description: 'Note Deleted Success: removes the note',
     action: noteDeletedSuccess({ note: notes[1] }),
     begin: { notes, teas, loading: true },
     end: { notes: [notes[0], notes[2]], teas },
   },
   {
-    description: `${ActionTypes.NoteDeletedFailure}: adds the error message / clears the loading flag`,
+    description:
+      'Note Deleted Failure: adds the error message / clears the loading flag',
     action: noteDeletedFailure({ errorMessage: 'Something is borked' }),
     begin: { notes, teas, loading: true },
     end: { notes, teas, errorMessage: 'Something is borked' },

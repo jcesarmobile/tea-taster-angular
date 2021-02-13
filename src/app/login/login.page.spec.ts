@@ -195,16 +195,16 @@ describe('LoginPage', () => {
     });
   });
 
-  function click(button: HTMLElement) {
+  const click = (button: HTMLElement) => {
     const event = new Event('click');
     button.dispatchEvent(event);
     fixture.detectChanges();
-  }
+  };
 
-  function setInputValue(input: HTMLIonInputElement, value: string) {
+  const setInputValue = (input: HTMLIonInputElement, value: string) => {
     const event = new InputEvent('ionChange');
     input.value = value;
     input.dispatchEvent(event);
     fixture.detectChanges();
-  }
+  };
 });

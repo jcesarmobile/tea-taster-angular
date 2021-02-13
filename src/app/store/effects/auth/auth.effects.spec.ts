@@ -4,7 +4,6 @@ import { provideMockActions } from '@ngrx/effects/testing';
 import { Observable, of, throwError } from 'rxjs';
 
 import {
-  ActionTypes,
   login,
   loginSuccess,
   logout,
@@ -78,7 +77,7 @@ describe('AuthEffects', () => {
         actions$ = of(login({ email: 'test@test.com', password: 'test' }));
         effects.login$.subscribe(action => {
           expect(action).toEqual({
-            type: ActionTypes.LoginSuccess,
+            type: '[Auth API] login success',
             session: {
               user: {
                 id: 73,
@@ -122,7 +121,7 @@ describe('AuthEffects', () => {
         actions$ = of(login({ email: 'test@test.com', password: 'badpass' }));
         effects.login$.subscribe(action => {
           expect(action).toEqual({
-            type: ActionTypes.LoginFailure,
+            type: '[Auth API] login failure',
             errorMessage: 'Invalid Username or Password',
           });
           done();
@@ -160,7 +159,7 @@ describe('AuthEffects', () => {
         actions$ = of(login({ email: 'test@test.com', password: 'badpass' }));
         effects.login$.subscribe(action => {
           expect(action).toEqual({
-            type: ActionTypes.LoginFailure,
+            type: '[Auth API] login failure',
             errorMessage: 'Unknown error in login',
           });
           done();
@@ -221,7 +220,7 @@ describe('AuthEffects', () => {
       actions$ = of(logout());
       effects.logout$.subscribe(action => {
         expect(action).toEqual({
-          type: ActionTypes.LogoutSuccess,
+          type: '[Auth API] logout success',
         });
         done();
       });
@@ -248,7 +247,7 @@ describe('AuthEffects', () => {
         actions$ = of(logout());
         effects.logout$.subscribe(action => {
           expect(action).toEqual({
-            type: ActionTypes.LogoutFailure,
+            type: '[Auth API] logout failure',
             errorMessage: 'Unknown error in logout',
           });
           done();
@@ -283,7 +282,7 @@ describe('AuthEffects', () => {
       actions$ = of(unauthError());
       effects.unauthError$.subscribe(action => {
         expect(action).toEqual({
-          type: ActionTypes.LogoutSuccess,
+          type: '[Auth API] logout success',
         });
         done();
       });

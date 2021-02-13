@@ -35,6 +35,7 @@ export class TeaService {
   }
 
   save(tea: Tea): Promise<void> {
+    /* eslint-disable @typescript-eslint/naming-convention */
     const { Storage } = Plugins;
     return Storage.set({
       key: `rating${tea.id}`,
@@ -43,6 +44,7 @@ export class TeaService {
   }
 
   private async convert(res: any): Promise<Tea> {
+    /* eslint-disable @typescript-eslint/naming-convention */
     const { Storage } = Plugins;
     const rating = await Storage.get({ key: `rating${res.id}` });
     return {

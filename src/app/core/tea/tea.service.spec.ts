@@ -86,7 +86,7 @@ describe('TeaService', () => {
     });
   });
 
-  function initializeTestData() {
+  const initializeTestData = () => {
     expectedTeas = [
       {
         id: 1,
@@ -151,5 +151,5 @@ describe('TeaService', () => {
       delete tea.rating;
       return tea;
     });
-  }
+  };
 });

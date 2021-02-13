@@ -79,6 +79,7 @@ export class TastingNoteEditorComponent implements OnInit {
   }
 
   async share() {
+    /* eslint-disable @typescript-eslint/naming-convention */
     const { Share } = Plugins;
     await Share.share({
       title: `${this.brand}: ${this.name}`,

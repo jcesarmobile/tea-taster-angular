@@ -1,6 +1,5 @@
 import { initialState, reducer } from './auth.reducer';
 import {
-  ActionTypes,
   login,
   loginFailure,
   loginSuccess,
@@ -16,7 +15,7 @@ it('returns the default state', () => {
   expect(reducer(undefined, { type: 'NOOP' })).toEqual(initialState);
 });
 
-describe(ActionTypes.Login, () => {
+describe('Login', () => {
   it('sets the loading flag and clears other data', () => {
     const action = login({ email: 'test@testy.com', password: 'mysecret' });
     expect(
@@ -34,7 +33,7 @@ describe(ActionTypes.Login, () => {
   });
 });
 
-describe(ActionTypes.LoginSuccess, () => {
+describe('Login Success', () => {
   it('clears the loading flag and sets the session', () => {
     const session: Session = {
       user: {
@@ -54,7 +53,7 @@ describe(ActionTypes.LoginSuccess, () => {
   });
 });
 
-describe(ActionTypes.LoginFailure, () => {
+describe('Login Failure', () => {
   it('clears the loading flag and sets the error', () => {
     const action = loginFailure({
       errorMessage: 'There was a failure, it was a mess',
@@ -66,7 +65,7 @@ describe(ActionTypes.LoginFailure, () => {
   });
 });
 
-describe(ActionTypes.SessionRestored, () => {
+describe('Session Restored', () => {
   it('sets the session', () => {
     const session: Session = {
       user: {
@@ -101,7 +100,7 @@ describe('logout actions', () => {
       }),
   );
 
-  describe(ActionTypes.Logout, () => {
+  describe('Logout', () => {
     it('sets the loading flag and clears the error message', () => {
       const action = logout();
       expect(
@@ -121,7 +120,7 @@ describe('logout actions', () => {
     });
   });
 
-  describe(ActionTypes.LogoutSuccess, () => {
+  describe('Logout Success', () => {
     it('clears the loading flag and the session', () => {
       const action = logoutSuccess();
       expect(
@@ -133,7 +132,7 @@ describe('logout actions', () => {
     });
   });
 
-  describe(ActionTypes.LogoutFailure, () => {
+  describe('Logout Failure', () => {
     it('clears the loading flag and sets the error', () => {
       const action = logoutFailure({
         errorMessage: 'There was a failure, it was a mess',
@@ -148,7 +147,7 @@ describe('logout actions', () => {
     });
   });
 
-  describe(ActionTypes.UnauthError, () => {
+  describe('Unauth Error', () => {
     it('clears the session', () => {
       const action = unauthError();
       expect(
