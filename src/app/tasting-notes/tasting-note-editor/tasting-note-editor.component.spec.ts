@@ -8,7 +8,7 @@ import { IonicModule, ModalController, Platform } from '@ionic/angular';
 
 import { SharedModule } from '@app/shared';
 import { selectTeas } from '@app/store';
-import { DataState, initialState } from '@app/store/reducers/data/data.reducer';
+import { DataState, initialState } from '@app/store/reducers/data.reducer';
 import { createOverlayControllerMock, createPlatformMock } from '@test/mocks';
 import { TastingNoteEditorComponent } from './tasting-note-editor.component';
 import { noteSaved } from '@app/store/actions';

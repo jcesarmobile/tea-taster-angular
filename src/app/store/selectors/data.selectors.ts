@@ -1,5 +1,5 @@
 import { createSelector, createFeatureSelector } from '@ngrx/store';
-import { DataState } from '@app/store/reducers/data/data.reducer';
+import { DataState } from '@app/store/reducers/data.reducer';
 import { TastingNote, Tea } from '@app/models';
 
 export const selectData = createFeatureSelector('data');

@@ -24,7 +24,7 @@ export class RatingComponent implements ControlValueAccessor {
 
   constructor() {}
 
-  /* eslint-disable @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match */
+  // eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle, id-blacklist, id-match
   onChange = (_rating: number) => {};
 
   onTouched = () => {};

@@ -6,7 +6,7 @@ import { Store } from '@ngrx/store';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { IonicModule, NavController } from '@ionic/angular';
 
-import { DataState, initialState } from '@app/store/reducers/data/data.reducer';
+import { DataState, initialState } from '@app/store/reducers/data.reducer';
 import { createActivatedRouteMock, createNavControllerMock } from '@test/mocks';
 import { selectTea } from '@app/store';
 import { SharedModule } from '@app/shared';

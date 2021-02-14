@@ -15,13 +15,13 @@ export class SessionVaultService {
   constructor(private store: Store<State>) {}
 
   async login(session: Session): Promise<void> {
-    /* eslint-disable @typescript-eslint/naming-convention */
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     const { Storage } = Plugins;
     await Storage.set({ key: this.key, value: JSON.stringify(session) });
   }
 
   async restoreSession(): Promise<Session> {
-    /* eslint-disable @typescript-eslint/naming-convention */
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     const { Storage } = Plugins;
     const { value } = await Storage.get({ key: this.key });
     const session = JSON.parse(value);
@@ -34,7 +34,7 @@ export class SessionVaultService {
   }
 
   async logout(): Promise<void> {
-    /* eslint-disable @typescript-eslint/naming-convention */
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     const { Storage } = Plugins;
     await Storage.remove({ key: this.key });
   }

@@ -14,7 +14,7 @@ import {
   createOverlayControllerMock,
   createOverlayElementMock,
 } from '@test/mocks';
-import { DataState, initialState } from '@app/store/reducers/data/data.reducer';
+import { DataState, initialState } from '@app/store/reducers/data.reducer';
 import { TastingNoteEditorComponent } from './tasting-note-editor/tasting-note-editor.component';
 import { TastingNoteEditorModule } from './tasting-note-editor/tasting-note-editor.module';
 import { TastingNotesPage } from './tasting-notes.page';

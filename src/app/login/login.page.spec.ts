@@ -11,7 +11,7 @@ import { IonicModule } from '@ionic/angular';
 import { Store } from '@ngrx/store';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 
-import { AuthState, initialState } from '@app/store/reducers/auth/auth.reducer';
+import { AuthState, initialState } from '@app/store/reducers/auth.reducer';
 import { LoginPage } from './login.page';
 import { login } from '@app/store/actions';
 import { selectAuthErrorMessage } from '@app/store';

@@ -1,2 +1,2 @@
-export * from './auth/auth.effects';
-export * from './data/data.effects';
+export * from './auth.effects';
+export * from './data.effects';

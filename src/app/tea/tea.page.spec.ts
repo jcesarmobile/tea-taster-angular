@@ -8,11 +8,11 @@ import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import {
   AuthState,
   initialState as initialAuthState,
-} from '@app/store/reducers/auth/auth.reducer';
+} from '@app/store/reducers/auth.reducer';
 import {
   DataState,
   initialState as initialDataState,
-} from '@app/store/reducers/data/data.reducer';
+} from '@app/store/reducers/data.reducer';
 import { TeaPage } from './tea.page';
 import { Tea } from '@app/models';
 import { selectTeas } from '@app/store/selectors';
