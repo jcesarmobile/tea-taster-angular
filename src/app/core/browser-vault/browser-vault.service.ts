@@ -31,7 +31,7 @@ export class BrowserVaultService implements IdentityVault {
   async unsubscribe(): Promise<void> {}
 
   async clear(): Promise<void> {
-    /* eslint-disable @typescript-eslint/naming-convention */
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     const { Storage } = Plugins;
     await Storage.clear();
   }
@@ -43,7 +43,7 @@ export class BrowserVaultService implements IdentityVault {
   }
 
   async isInUse(): Promise<boolean> {
-    /* eslint-disable @typescript-eslint/naming-convention */
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     const { Storage } = Plugins;
     return !!(await Storage.get({ key: 'session' }));
   }
@@ -67,32 +67,31 @@ export class BrowserVaultService implements IdentityVault {
   }
 
   async storeValue(key: string, value: any): Promise<void> {
-    /* eslint-disable @typescript-eslint/naming-convention */
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     const { Storage } = Plugins;
     await Storage.set({ key, value: JSON.stringify(value) });
   }
 
   async getValue(key: string): Promise<any> {
-    /* eslint-disable @typescript-eslint/naming-convention */
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     const { Storage } = Plugins;
     const { value } = await Storage.get({ key });
     return JSON.parse(value);
   }
 
   async removeValue(key: string): Promise<void> {
-    /* eslint-disable @typescript-eslint/naming-convention */
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     const { Storage } = Plugins;
     await Storage.remove({ key });
   }
 
   async getKeys(): Promise<Array<string>> {
-    /* eslint-disable @typescript-eslint/naming-convention */
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     const { Storage } = Plugins;
     const { keys } = await Storage.keys();
     return keys;
   }
 
-  // tslint:disable-next-line
   async getBiometricType(): Promise<BiometricType> {
     return 'none';
   }
