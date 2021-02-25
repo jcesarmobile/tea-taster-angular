@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Plugins } from '@capacitor/core';
+import { Storage } from '@capacitor/storage';
 import { Observable } from 'rxjs';
 
 import { Tea } from '@app/models';
@@ -35,8 +35,6 @@ export class TeaService {
   }
 
   save(tea: Tea): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    const { Storage } = Plugins;
     return Storage.set({
       key: `rating${tea.id}`,
       value: tea.rating.toString(),
@@ -44,8 +42,6 @@ export class TeaService {
   }
 
   private async convert(res: any): Promise<Tea> {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    const { Storage } = Plugins;
     const rating = await Storage.get({ key: `rating${res.id}` });
     return {
       ...res,

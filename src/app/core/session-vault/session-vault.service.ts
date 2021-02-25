@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Plugins } from '@capacitor/core';
-import { Store } from '@ngrx/store';
-
 import { Session } from '@app/models';
-import { sessionRestored } from '@app/store/actions';
 import { State } from '@app/store';
+import { sessionRestored } from '@app/store/actions';
+import { Storage } from '@capacitor/storage';
+import { Store } from '@ngrx/store';
 
 @Injectable({
   providedIn: 'root',
@@ -15,14 +14,10 @@ export class SessionVaultService {
   constructor(private store: Store<State>) {}
 
   async login(session: Session): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    const { Storage } = Plugins;
     await Storage.set({ key: this.key, value: JSON.stringify(session) });
   }
 
   async restoreSession(): Promise<Session> {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    const { Storage } = Plugins;
     const { value } = await Storage.get({ key: this.key });
     const session = JSON.parse(value);
 
@@ -34,8 +29,6 @@ export class SessionVaultService {
   }
 
   async logout(): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    const { Storage } = Plugins;
     await Storage.remove({ key: this.key });
   }
 }
