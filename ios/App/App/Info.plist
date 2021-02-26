@@ -28,12 +28,12 @@
 				<string>capacitor</string>
 			</array>
 		</dict>
-    <dict>
-      <key>CFBundleURLSchemes</key>
-      <array>
-        <string>myapp</string>
-      </array>
-    </dict>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>myapp</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>1</string>
@@ -46,6 +46,8 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>To Take Photos and Video</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Use Face ID to unlock the application</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>Always allow Geolocation?</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
@@ -79,7 +81,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
-	<key>NSFaceIDUsageDescription</key>
-	<string>Use Face ID to unlock the application</string>
 </dict>
 </plist>
