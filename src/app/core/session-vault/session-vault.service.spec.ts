@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { Store } from '@ngrx/store';
 import { sessionRestored } from '@app/store/actions';
-import { Plugins } from '@capacitor/core';
+import { Storage } from '@capacitor/storage';
 
 import { Session } from '@app/models';
 import { SessionVaultService } from './session-vault.service';
@@ -9,23 +9,12 @@ import { provideMockStore } from '@ngrx/store/testing';
 
 describe('SessionVaultService', () => {
   let service: SessionVaultService;
-  let originalStorage: any;
 
   beforeEach(() => {
-    originalStorage = Plugins.Storage;
-    Plugins.Storage = jasmine.createSpyObj('Storage', {
-      get: Promise.resolve(),
-      set: Promise.resolve(),
-      remove: Promise.resolve(),
-    });
     TestBed.configureTestingModule({
       providers: [provideMockStore()],
     });
     service = TestBed.inject(SessionVaultService);
-  });
-
-  afterEach(() => {
-    Plugins.Storage = originalStorage;
   });
 
   it('should be created', () => {
@@ -33,6 +22,10 @@ describe('SessionVaultService', () => {
   });
 
   describe('login', () => {
+    beforeEach(() => {
+      spyOn(Storage, 'set').and.returnValue(Promise.resolve());
+    });
+
     it('saves the session in storage', async () => {
       const session: Session = {
         user: {
@@ -44,8 +37,8 @@ describe('SessionVaultService', () => {
         token: '19940059fkkf039',
       };
       await service.login(session);
-      expect(Plugins.Storage.set).toHaveBeenCalledTimes(1);
-      expect(Plugins.Storage.set).toHaveBeenCalledWith({
+      expect(Storage.set).toHaveBeenCalledTimes(1);
+      expect(Storage.set).toHaveBeenCalledWith({
         key: 'auth-session',
         value: JSON.stringify(session),
       });
@@ -54,12 +47,10 @@ describe('SessionVaultService', () => {
 
   describe('restoreSession', () => {
     it('gets the session from storage', async () => {
-      (Plugins.Storage.get as any).and.returnValue(
-        Promise.resolve({ value: null }),
-      );
+      spyOn(Storage, 'get').and.returnValue(Promise.resolve({ value: null }));
       await service.restoreSession();
-      expect(Plugins.Storage.get).toHaveBeenCalledTimes(1);
-      expect(Plugins.Storage.get).toHaveBeenCalledWith({
+      expect(Storage.get).toHaveBeenCalledTimes(1);
+      expect(Storage.get).toHaveBeenCalledWith({
         key: 'auth-session',
       });
     });
@@ -75,7 +66,7 @@ describe('SessionVaultService', () => {
         token: '19940059fkkf039',
       };
       beforeEach(() => {
-        (Plugins.Storage.get as any).and.returnValue(
+        spyOn(Storage, 'get').and.returnValue(
           Promise.resolve({ value: JSON.stringify(session) }),
         );
       });
@@ -97,9 +88,7 @@ describe('SessionVaultService', () => {
 
     describe('without a session', () => {
       beforeEach(() => {
-        (Plugins.Storage.get as any).and.returnValue(
-          Promise.resolve({ value: null }),
-        );
+        spyOn(Storage, 'get').and.returnValue(Promise.resolve({ value: null }));
       });
 
       it('resolves the session', async () => {
@@ -116,10 +105,14 @@ describe('SessionVaultService', () => {
   });
 
   describe('logout', () => {
+    beforeEach(() => {
+      spyOn(Storage, 'remove').and.returnValue(Promise.resolve());
+    });
+
     it('clears the storage', async () => {
       await service.logout();
-      expect(Plugins.Storage.remove).toHaveBeenCalledTimes(1);
-      expect(Plugins.Storage.remove).toHaveBeenCalledWith({
+      expect(Storage.remove).toHaveBeenCalledTimes(1);
+      expect(Storage.remove).toHaveBeenCalledWith({
         key: 'auth-session',
       });
     });

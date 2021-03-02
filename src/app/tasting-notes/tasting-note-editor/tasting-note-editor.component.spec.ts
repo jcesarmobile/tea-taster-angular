@@ -1,7 +1,7 @@
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
-import { Plugins } from '@capacitor/core';
+import { Share } from '@capacitor/share';
 import { Store } from '@ngrx/store';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { IonicModule, ModalController, Platform } from '@ionic/angular';
@@ -20,10 +20,6 @@ describe('TastingNoteEditorComponent', () => {
 
   beforeEach(
     waitForAsync(() => {
-      originalShare = Plugins.Share;
-      Plugins.Share = jasmine.createSpyObj('Share', {
-        share: Promise.resolve(),
-      });
       TestBed.configureTestingModule({
         declarations: [TastingNoteEditorComponent],
         imports: [FormsModule, IonicModule, SharedModule],
@@ -64,8 +60,6 @@ describe('TastingNoteEditorComponent', () => {
       component = fixture.componentInstance;
     }),
   );
-
-  afterEach(() => (Plugins.Share = originalShare));
 
   it('should create', () => {
     fixture.detectChanges();
@@ -178,6 +172,9 @@ describe('TastingNoteEditorComponent', () => {
       });
 
       it('calls the share plugin when clicked', async () => {
+        spyOn(Share, 'share').and.returnValue(
+          Promise.resolve({ activityType: null }),
+        );
         const button = fixture.debugElement.query(By.css('#share-button'));
 
         component.brand = 'Lipton';
@@ -188,8 +185,8 @@ describe('TastingNoteEditorComponent', () => {
         button.nativeElement.dispatchEvent(event);
         fixture.detectChanges();
 
-        expect(Plugins.Share.share).toHaveBeenCalledTimes(1);
-        expect(Plugins.Share.share).toHaveBeenCalledWith({
+        expect(Share.share).toHaveBeenCalledTimes(1);
+        expect(Share.share).toHaveBeenCalledWith({
           title: 'Lipton: Yellow Label',
           text: 'I gave Lipton: Yellow Label 2 stars on the Tea Taster app',
           dialogTitle: 'Share your tasting note',

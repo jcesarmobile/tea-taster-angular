@@ -1,49 +1,39 @@
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import {
   HttpClientTestingModule,
   HttpTestingController,
 } from '@angular/common/http/testing';
-import { Plugins } from '@capacitor/core';
-
-import { environment } from '@env/environment';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { Tea } from '@app/models';
+import { Storage } from '@capacitor/storage';
+import { environment } from '@env/environment';
 import { TeaService } from './tea.service';
 
 describe('TeaService', () => {
   let httpTestingController: HttpTestingController;
   let expectedTeas: Array<Tea>;
   let resultTeas: Array<Tea>;
-  let originalStorage: any;
   let service: TeaService;
 
   beforeEach(() => {
-    originalStorage = Plugins.Storage;
-    Plugins.Storage = jasmine.createSpyObj('Storage', {
-      get: Promise.resolve(),
-      set: Promise.resolve(),
-    });
+    spyOn(Storage, 'get').and.returnValue(Promise.resolve({ value: null }));
     initializeTestData();
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
     });
-    (Plugins.Storage.get as any)
+    (Storage.get as any)
       .withArgs({ key: 'rating1' })
       .and.returnValue(Promise.resolve({ value: '4' }));
-    (Plugins.Storage.get as any)
+    (Storage.get as any)
       .withArgs({ key: 'rating3' })
       .and.returnValue(Promise.resolve({ value: '2' }));
-    (Plugins.Storage.get as any)
+    (Storage.get as any)
       .withArgs({ key: 'rating4' })
       .and.returnValue(Promise.resolve({ value: '4' }));
-    (Plugins.Storage.get as any)
+    (Storage.get as any)
       .withArgs({ key: 'rating6' })
       .and.returnValue(Promise.resolve({ value: '5' }));
     httpTestingController = TestBed.inject(HttpTestingController);
     service = TestBed.inject(TeaService);
-  });
-
-  afterEach(() => {
-    Plugins.Storage = originalStorage;
   });
 
   it('should be created', () => {
@@ -75,11 +65,12 @@ describe('TeaService', () => {
 
   describe('save', () => {
     it('saves the value', () => {
+      spyOn(Storage, 'set').and.returnValue(Promise.resolve());
       const tea = { ...expectedTeas[4] };
       tea.rating = 4;
       service.save(tea);
-      expect(Plugins.Storage.set).toHaveBeenCalledTimes(1);
-      expect(Plugins.Storage.set).toHaveBeenCalledWith({
+      expect(Storage.set).toHaveBeenCalledTimes(1);
+      expect(Storage.set).toHaveBeenCalledWith({
         key: 'rating5',
         value: '4',
       });
