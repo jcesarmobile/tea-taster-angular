@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Plugins } from '@capacitor/core';
+import { Storage } from '@capacitor/storage';
 import {
   BiometricType,
   IdentityVault,
@@ -31,8 +31,6 @@ export class BrowserVaultService implements IdentityVault {
   async unsubscribe(): Promise<void> {}
 
   async clear(): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    const { Storage } = Plugins;
     await Storage.clear();
   }
 
@@ -43,8 +41,6 @@ export class BrowserVaultService implements IdentityVault {
   }
 
   async isInUse(): Promise<boolean> {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    const { Storage } = Plugins;
     return !!(await Storage.get({ key: 'session' }));
   }
 
@@ -67,27 +63,19 @@ export class BrowserVaultService implements IdentityVault {
   }
 
   async storeValue(key: string, value: any): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    const { Storage } = Plugins;
     await Storage.set({ key, value: JSON.stringify(value) });
   }
 
   async getValue(key: string): Promise<any> {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    const { Storage } = Plugins;
     const { value } = await Storage.get({ key });
     return JSON.parse(value);
   }
 
   async removeValue(key: string): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    const { Storage } = Plugins;
     await Storage.remove({ key });
   }
 
   async getKeys(): Promise<Array<string>> {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    const { Storage } = Plugins;
     const { keys } = await Storage.keys();
     return keys;
   }
